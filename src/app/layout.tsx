@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "@lib/styles/base.css";
+import React from "react";
 
 export const metadata: Metadata = {
   title: "NarraLeaf Editor",
