@@ -9,12 +9,12 @@ const navigation = [
 export default function Home() {
 
     return (
-        <div className="bg-white">
+        <div className="bg-white min-h-screen">
             <header className="absolute inset-x-0 top-0 z-50">
                 <nav aria-label="Global" className="flex items-center justify-between p-6 lg:px-8">
                     <div className="flex lg:flex-1">
                         <a href="#" className="-m-1.5 p-1.5">
-                            <span className="sr-only">Your Company</span>
+                            <span className="sr-only">NarraLeaf</span>
                             <Image
                                 alt=""
                                 src="/static/images/logo-icon-blue.png"
@@ -48,19 +48,19 @@ export default function Home() {
                     </div>
                     <div className="text-center">
                         <h1 className="text-balance text-5xl font-semibold tracking-tight text-gray-900 sm:text-7xl">
-                            Heading 1
+                            NarraLeaf Editor
                         </h1>
                         <p className="mt-8 text-pretty text-lg font-medium text-gray-500 sm:text-xl/8">
-                            Subheading
+                            A simple and powerful editor for creating and managing your NarraLeaf scripts.
                         </p>
                         <div className="mt-10 flex items-center justify-center gap-x-6">
                             <a
                                 href="#"
-                                className="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                                className="rounded-md px-6 shadow-md transition-colors duration-100 bg-primary py-2.5 text-sm font-semibold text-white hover:bg-primary-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                             >
                                 Get started
                             </a>
-                            <a href="#" className="text-sm/6 font-semibold text-gray-900">
+                            <a href="#" className="text-sm/6 font-semibold text-primary hover:text-primary-400 transition-colors duration-100 hover:underline decoration-primary decoration-2">
                                 Learn more <span aria-hidden="true">→</span>
                             </a>
                         </div>
