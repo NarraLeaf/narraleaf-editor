@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import React, { useState } from 'react';
 
 const ResizablePanel = (
@@ -34,6 +35,10 @@ const ResizablePanel = (
         document.addEventListener('mousemove', onMouseMove);
         document.addEventListener('mouseup', onMouseUp);
     };
+
+    if (React.Children.count(children) === 1) {
+        return <div className={clsx(className, "h-full")}>{children}</div>;
+    }
 
     return (
         <div style={{ display: 'flex', height: '100%', flexDirection: direction === 'vertical' ? 'row' : 'column' }} className={className}>
