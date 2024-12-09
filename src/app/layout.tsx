@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "@lib/styles/base.css";
+import React from "react";
 
 export const metadata: Metadata = {
   title: "NarraLeaf Editor",
@@ -14,7 +15,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`antialiased`}
+        className={`antialiased h-full min-h-screen`}
       >
         {children}
       </body>
