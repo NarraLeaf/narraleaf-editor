@@ -11,13 +11,13 @@ export default function ToolBarGroup(
     }>
 ) {
     return (
-        <div>
+        <>
             {group.getFolders().map((folder, i) => (
                 <HorizontalBox key={i}>
                     <ToolBarFolder folder={folder}/>
                 </HorizontalBox>
             ))}
-        </div>
+        </>
     );
 }
 

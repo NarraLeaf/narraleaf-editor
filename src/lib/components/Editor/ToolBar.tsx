@@ -9,19 +9,19 @@ export function ToolBar() {
     const {left, right} = editor.GUIManger.getToolBarGroupsByPosition();
 
     return (
-        <div className="w-full h-10 flex justify-between select-none">
+        <div className="w-full h-fit flex justify-between select-none">
             <HorizontalBox>
                 {left.map((group, index) => (
-                    <div key={index}>
+                    <React.Fragment key={index}>
                         <ToolBarGroup group={group}/>
-                    </div>
+                    </React.Fragment>
                 ))}
             </HorizontalBox>
             <HorizontalBox>
                 {right.map((group, index) => (
-                    <div key={index}>
+                    <React.Fragment key={index}>
                         <ToolBarGroup group={group}/>
-                    </div>
+                    </React.Fragment>
                 ))}
             </HorizontalBox>
         </div>

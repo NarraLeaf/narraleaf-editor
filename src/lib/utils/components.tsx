@@ -6,7 +6,7 @@ export function HorizontalBox(
         children,
         className,
     }: Readonly<{
-    children: React.ReactNode;
+    children?: React.ReactNode;
     className?: string;
 }>) {
     return (
@@ -21,7 +21,7 @@ export function VerticalBox(
         children,
         className,
     }: Readonly<{
-    children: React.ReactNode;
+    children?: React.ReactNode;
     className?: string;
 }>) {
     return (

@@ -1,7 +1,7 @@
 import React from "react";
 
 type SideBarRegistry = {
-    [key: string]: SideBarConfig;
+    [key: string]: SideBarItem;
 };
 export type SideBarConfig = {
     name: string;
@@ -19,6 +19,26 @@ export enum SideBarPosition {
     Bottom = "bottom",
 }
 
+export class SideBarItem {
+    private data: SideBarConfig;
+
+    constructor(data: SideBarConfig) {
+        this.data = data;
+    }
+
+    public getName(): string {
+        return this.data.name;
+    }
+
+    public getComponent(): React.ReactNode {
+        return this.data.component;
+    }
+
+    public getIcon(): React.ReactNode {
+        return this.data.icon;
+    }
+}
+
 export class SideBar {
     private data: SideBarState;
 
@@ -29,11 +49,28 @@ export class SideBar {
         this.data = data;
     }
 
-    public getRegistry(): SideBarRegistry {
-        return this.data.registry;
+    public getCurrentKey(): string | null {
+        return this.data.current;
     }
 
-    public getCurrent(): SideBarConfig | null {
+    public getCurrent(): SideBarItem | null {
         return this.data.current ? this.data.registry[this.data.current] : null;
+    }
+
+    public setCurrent(key: string | null): this {
+        if (key && !this.data.registry[key]) {
+            throw new Error(`Sidebar "${key}" is not registered`);
+        }
+        this.data.current = key;
+        return this;
+    }
+
+    public register(key: string, config: SideBarItem): this {
+        this.data.registry[key] = config;
+        return this;
+    }
+
+    public entries(): [string, SideBarItem][] {
+        return Object.entries(this.data.registry);
     }
 }

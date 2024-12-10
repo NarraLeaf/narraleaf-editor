@@ -8,6 +8,7 @@ export enum ToolBarPosition {
 type ToolBarPartRegistry = {
     folders: ToolBarFolder[];
     align: ToolBarPosition;
+    isActive?: () => boolean;
 };
 type ToolBarFolderConfig = {
     name: string;
@@ -36,6 +37,10 @@ export class ToolBarGroup {
     public addFolder(folder: ToolBarFolder): this {
         this.data.folders.push(folder);
         return this;
+    }
+
+    public isActive(): boolean {
+        return this.data.isActive ? this.data.isActive() : true;
     }
 }
 

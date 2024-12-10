@@ -1,7 +1,8 @@
 import React from "react";
 import {ToolBarGroup, ToolBarPosition, ToolBarRegistry} from "@lib/editor/ToolBar";
-import {SideBar, SideBarConfig, SideBarPosition} from "@lib/editor/SideBar";
+import {SideBar, SideBarPosition} from "@lib/editor/SideBar";
 import {EventEmitter} from "events";
+import {EditorEventToken} from "@lib/editor/type";
 
 type GUIData = {
     sidebar: {
@@ -14,15 +15,16 @@ type GUIData = {
     toolbar: ToolBarRegistry;
 };
 
-type GUIManagerEventToken = {
-    off: () => void;
-};
-
 export class GUIManager {
     readonly events: EventEmitter<{
         "event:editor.requestFlush": [];
     }> = new EventEmitter();
     private data: GUIData;
+    private updateCounter: number = 0;
+
+    public get deps(): unknown[] {
+        return [this.updateCounter];
+    }
 
     constructor() {
         this.data = {
@@ -40,9 +42,9 @@ export class GUIManager {
     }
 
     public getSideBars(): {
-        left: SideBarConfig | null;
-        right: SideBarConfig | null;
-        bottom: SideBarConfig | null;
+        left: SideBar | null;
+        right: SideBar | null;
+        bottom: SideBar | null;
     } {
         return {
             left: this.getSideBar(SideBarPosition.Left),
@@ -51,8 +53,8 @@ export class GUIManager {
         };
     }
 
-    public getSideBar(side: SideBarPosition): SideBarConfig | null {
-        return this.data.sidebar[side].getCurrent();
+    public getSideBar(side: SideBarPosition): SideBar | null {
+        return this.data.sidebar[side];
     }
 
     public getMainContent(side: "left" | "right"): React.ReactNode {
@@ -89,6 +91,9 @@ export class GUIManager {
         const left: ToolBarGroup[] = [];
         const right: ToolBarGroup[] = [];
         for (const group of Object.values(this.data.toolbar)) {
+            if (!group.isActive()) {
+                continue;
+            }
             if (group.getAlign() === ToolBarPosition.Left) {
                 left.push(group);
             } else if (group.getAlign() === ToolBarPosition.Right) {
@@ -106,7 +111,12 @@ export class GUIManager {
         return this;
     }
 
-    public onRequestFlush(callback: () => void): GUIManagerEventToken {
+    public requestElevatedFlush(): this {
+        this.updateCounter++;
+        return this.requestFlush();
+    }
+
+    public onRequestFlush(callback: () => void): EditorEventToken {
         this.events.on("event:editor.requestFlush", callback);
         return {
             off: () => {
