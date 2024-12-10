@@ -1,6 +1,7 @@
 import React from "react";
-import {ToolBarGroup, ToolBarRegistry} from "@lib/editor/ToolBar";
+import {ToolBarGroup, ToolBarPosition, ToolBarRegistry} from "@lib/editor/ToolBar";
 import {SideBar, SideBarConfig, SideBarPosition} from "@lib/editor/SideBar";
+import {EventEmitter} from "events";
 
 type GUIData = {
     sidebar: {
@@ -13,7 +14,14 @@ type GUIData = {
     toolbar: ToolBarRegistry;
 };
 
+type GUIManagerEventToken = {
+    off: () => void;
+};
+
 export class GUIManager {
+    readonly events: EventEmitter<{
+        "event:editor.requestFlush": [];
+    }> = new EventEmitter();
     private data: GUIData;
 
     constructor() {
@@ -53,12 +61,17 @@ export class GUIManager {
 
     public setMainContent(side: "left" | "right", content: React.ReactNode): this {
         this.data.main[side] = content;
-        return this;
+        return this.requestFlush();
     }
 
-    public registerToolBar(key: string, config: ToolBarGroup): this {
+    public registerToolBarGroup(key: string, config: ToolBarGroup): this {
         this.data.toolbar[key] = config;
-        return this;
+        return this.requestFlush();
+    }
+
+    public unregisterToolBarGroup(key: string): this {
+        delete this.data.toolbar[key];
+        return this.requestFlush();
     }
 
     public getToolBarGroup(key: string): ToolBarGroup | null {
@@ -76,15 +89,29 @@ export class GUIManager {
         const left: ToolBarGroup[] = [];
         const right: ToolBarGroup[] = [];
         for (const group of Object.values(this.data.toolbar)) {
-            if (group.getAlign() === "left") {
+            if (group.getAlign() === ToolBarPosition.Left) {
                 left.push(group);
-            } else if (group.getAlign() === "right") {
+            } else if (group.getAlign() === ToolBarPosition.Right) {
                 right.push(group);
             }
         }
         return {
             left,
             right,
+        };
+    }
+
+    public requestFlush(): this {
+        this.events.emit("event:editor.requestFlush");
+        return this;
+    }
+
+    public onRequestFlush(callback: () => void): GUIManagerEventToken {
+        this.events.on("event:editor.requestFlush", callback);
+        return {
+            off: () => {
+                this.events.off("event:editor.requestFlush", callback);
+            }
         };
     }
 }

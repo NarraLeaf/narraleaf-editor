@@ -1,22 +1,20 @@
-import React from "react";
-
 export type ToolBarRegistry = Record<string, ToolBarGroup> & object;
+
 export enum ToolBarPosition {
     Left = "left",
     Right = "right",
 }
+
 type ToolBarPartRegistry = {
     folders: ToolBarFolder[];
     align: ToolBarPosition;
 };
 type ToolBarFolderConfig = {
     name: string;
-    icon: React.ReactNode;
     items: ToolBarItem[];
 };
 type ToolBarItemConfig = {
     name: string;
-    icon: React.ReactNode;
     onClick: () => void;
 };
 
@@ -52,10 +50,6 @@ export class ToolBarFolder {
         return this.data.name;
     }
 
-    public getIcon(): React.ReactNode {
-        return this.data.icon;
-    }
-
     public getItems(): ToolBarItem[] {
         return this.data.items;
     }
@@ -75,10 +69,6 @@ export class ToolBarItem {
 
     public getName(): string {
         return this.data.name;
-    }
-
-    public getIcon(): React.ReactNode {
-        return this.data.icon;
     }
 
     public onClick(): void {
