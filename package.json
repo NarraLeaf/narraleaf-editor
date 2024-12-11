@@ -18,8 +18,9 @@
     "@nextui-org/react": "^2.4.8",
     "clsx": "^2.1.1",
     "framer-motion": "^11.13.1",
+    "narraleaf-react": "^0.2.2",
     "next": "15.0.3",
-    "react": "18.2"
+    "react": "18"
   },
   "devDependencies": {
     "@types/node": "^20",
