@@ -4,16 +4,23 @@ import {SideBar, SideBarPosition} from "@lib/editor/SideBar";
 import {EventEmitter} from "events";
 import {EditorEventToken} from "@lib/editor/type";
 
+type MainContent = SideBar | React.ReactNode | null;
 type GUIData = {
     sidebar: {
         [key in SideBarPosition]: SideBar;
     };
     main: {
-        left: React.ReactNode;
-        right: React.ReactNode;
+        [K in MainContentPosition]: MainContent;
     };
     toolbar: ToolBarRegistry;
 };
+
+export enum MainContentPosition {
+    Left = "left",
+    Right = "right",
+    Bottom = "bottom",
+    Center = "center",
+}
 
 export class GUIManager {
     readonly events: EventEmitter<{
@@ -27,15 +34,20 @@ export class GUIManager {
     }
 
     constructor() {
+        const sideBars: {
+            [key in SideBarPosition]: SideBar;
+        } = {
+            left: new SideBar(),
+            right: new SideBar(),
+            bottom: new SideBar(),
+        }
         this.data = {
-            sidebar: {
-                left: new SideBar(),
-                right: new SideBar(),
-                bottom: new SideBar(),
-            },
+            sidebar: sideBars,
             main: {
-                left: null,
+                left: sideBars.left,
                 right: null,
+                bottom: sideBars.bottom,
+                center: null,
             },
             toolbar: {},
         };
@@ -57,11 +69,20 @@ export class GUIManager {
         return this.data.sidebar[side];
     }
 
-    public getMainContent(side: "left" | "right"): React.ReactNode {
-        return this.data.main[side];
+    public renderMainContent(side: MainContentPosition): React.ReactNode | null {
+        if (!this.data.main[side]) {
+            return null;
+        }
+        if (SideBar.isSideBar(this.data.main[side])) {
+            return this.data.main[side].getCurrent()?.getComponent() || null;
+        }
+        if (React.isValidElement(this.data.main[side])) {
+            return this.data.main[side];
+        }
+        return null;
     }
 
-    public setMainContent(side: "left" | "right", content: React.ReactNode): this {
+    public setMainContent(side: MainContentPosition, content: MainContent): this {
         this.data.main[side] = content;
         return this.requestFlush();
     }

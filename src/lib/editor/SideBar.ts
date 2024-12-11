@@ -40,6 +40,10 @@ export class SideBarItem {
 }
 
 export class SideBar {
+    public static isSideBar(obj: unknown): obj is SideBar {
+        return obj instanceof SideBar;
+    }
+
     private data: SideBarState;
 
     constructor(data: SideBarState = {

@@ -1,3 +1,5 @@
+import {Editor} from "@lib/editor/editor";
+
 export type ToolBarRegistry = Record<string, ToolBarGroup> & object;
 
 export enum ToolBarPosition {
@@ -16,7 +18,7 @@ type ToolBarFolderConfig = {
 };
 type ToolBarItemConfig = {
     name: string;
-    onClick: () => void;
+    onClick: (ctx: IToolBarItemOnClickCtx) => void;
 };
 
 export class ToolBarGroup {
@@ -65,6 +67,10 @@ export class ToolBarFolder {
     }
 }
 
+export interface IToolBarItemOnClickCtx {
+    editor: Editor;
+}
+
 export class ToolBarItem {
     private data: ToolBarItemConfig;
 
@@ -76,7 +82,7 @@ export class ToolBarItem {
         return this.data.name;
     }
 
-    public onClick(): void {
-        this.data.onClick();
+    public onClick(ctx: IToolBarItemOnClickCtx): void {
+        this.data.onClick(ctx);
     }
 }

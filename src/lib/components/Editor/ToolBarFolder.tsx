@@ -51,7 +51,9 @@ export default function ToolBarFolder({
     }, [open]);
 
     function handleItemClick(item: ToolBarItem) {
-        item.onClick();
+        item.onClick({
+            editor
+        });
         setOpen(false);
     }
 
@@ -78,13 +80,11 @@ export default function ToolBarFolder({
     return (
         <>
             <div
-                className={"h-fit p-1 round-md hover:bg-gray-200 mx-1 px-2"}
+                className={"h-8 p-1 round-md hover:bg-gray-200 px-2 flex items-center justify-center"}
                 onMouseDown={handleMouseDown}
                 ref={buttonRef}
             >
-                <div className={"flex items-center"}>
-                    <div className={"text-xs"}>{folder.getName()}</div>
-                </div>
+                <div className={"text-xs"}>{folder.getName()}</div>
             </div>
 
             {open && (

@@ -42,13 +42,12 @@ export class Editor {
     public static Events = {
         Editor: {
             KeyPressed: "event:editor.keyPressed",
+            Resize: "event:editor.resize",
         },
     }
 
     public GUIManger = new GUIManager();
-    public events: EventEmitter<{
-        [K in typeof Editor.Events.Editor.KeyPressed]: [string];
-    }> = new EventEmitter();
+    public events: EventEmitter = new EventEmitter();
 
     public onKeyPress(key: React.KeyboardEvent["key"], callback: () => void): EditorEventToken {
         this.events.on(Editor.Events.Editor.KeyPressed, (k) => {
@@ -59,6 +58,15 @@ export class Editor {
         return {
             off: () => {
                 this.events.off(Editor.Events.Editor.KeyPressed, callback);
+            }
+        };
+    }
+
+    public onResize(callback: () => void): EditorEventToken {
+        this.events.on(Editor.Events.Editor.Resize, callback);
+        return {
+            off: () => {
+                this.events.off(Editor.Events.Editor.Resize, callback);
             }
         };
     }

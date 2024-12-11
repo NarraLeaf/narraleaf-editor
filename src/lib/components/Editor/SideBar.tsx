@@ -2,6 +2,7 @@ import React from "react";
 import {VerticalBox} from "@lib/utils/components";
 import {SideBar as EditorSideBar} from "@lib/editor/SideBar";
 import clsx from "clsx";
+import {SideBarItem} from "@lib/components/Editor/SideBarItem";
 
 
 export default function SideBar(
@@ -17,28 +18,12 @@ export default function SideBar(
         return null;
     }
 
-    const handleSelectItem = (item: string) => {
-        if (sideBar.getCurrentKey() === item) {
-            sideBar.setCurrent(null);
-        }
-        sideBar.setCurrent(item);
-        console.debug("SideBar: selected item", item);
-    }
-
     return (
         <>
             <VerticalBox className={clsx("w-full h-1/2 align-top items-center", className)}>
-                {sideBar.entries().map(([key, item]) => {
-                    return (
-                        <div
-                            key={key}
-                            className={"p-2 hover:bg-gray-200"}
-                            onClick={() => handleSelectItem(key)}
-                        >
-                            {item.getIcon()}
-                        </div>
-                    );
-                })}
+                {sideBar.entries().map((reg) =>
+                    (<SideBarItem registry={reg} sideBar={sideBar} key={reg[0]} />)
+                )}
             </VerticalBox>
         </>
     );
