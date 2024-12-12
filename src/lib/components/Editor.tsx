@@ -1,16 +1,16 @@
 import React, {useEffect} from "react";
-import SideBar from "@lib/components/Editor/SideBar";
+import SideBar from "@lib/components/Editor/SideBar/SideBar";
 import HelloPage from "@lib/components/Pages/Hello";
 import ResizablePanel from "@lib/components/ResizablePanel";
 import {useEditor} from "@lib/providers/Editor";
 import {SideBarPosition} from "@lib/editor/SideBar";
 import {MainContentPosition} from "@lib/editor/GUIManager";
-import {ToolBarGroups} from "@lib/components/Editor/ToolBarGroups";
+import {ToolBarGroups} from "@lib/components/Editor/ToolBar/ToolBarGroups";
 import {KeyEventAnnouncer} from "@lib/components/KeyEventAnnouncer";
-import {ToolBar as EditorToolBar} from "@lib/components/Editor/ToolBar";
+import {ToolBar as EditorToolBar} from "@lib/components/Editor/ToolBar/ToolBar";
 import {WindowEventAnnouncer} from "@lib/components/WindowEventAnnouncer";
 import {HorizontalBox, useFlush, VerticalBox} from "@lib/utils/components";
-import {SideBarItemsRegistry} from "@lib/components/Editor/SideBarItemsRegistry";
+import {SideBarItemsRegistry} from "@lib/components/Editor/SideBar/SideBarItemsRegistry";
 
 function MainContent(
     {
@@ -60,8 +60,7 @@ function MainContent(
     return (
         <>
             <ResizablePanel direction={"vertical"} size={getHeight(bottomPanelSize)} onResize={setBottomPanelSize}>
-                <ResizablePanel direction={"horizontal"} size={getWidth(leftPanelSize)} onResize={setLeftPanelSize}
-                                key={"$0"}>
+                <ResizablePanel direction={"horizontal"} size={getWidth(leftPanelSize)} onResize={setLeftPanelSize}>
                     <ResizablePanel direction={"horizontal"} size={getWidth(rightPanelSize)}
                                     onResize={setRightPanelSize}>
                         {editor.GUIManger.renderMainContent(MainContentPosition.Left)}

@@ -2,7 +2,7 @@ import React from "react";
 import {useFlush, VerticalBox} from "@lib/utils/components";
 import {SideBar as EditorSideBar} from "@lib/editor/SideBar";
 import clsx from "clsx";
-import {SideBarItem} from "@lib/components/Editor/SideBarItem";
+import {SideBarItem} from "@lib/components/Editor/SideBar/SideBarItem";
 import {useEditor} from "@lib/providers/Editor";
 
 

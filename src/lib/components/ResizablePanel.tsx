@@ -16,8 +16,6 @@ const ResizablePanel = (
         direction?: 'horizontal' | 'vertical';
         size: number;
         onResize: (size: number) => void;
-        // left: React.ReactNode;
-        // right: React.ReactNode;
     }>) => {
     const containerRef = React.useRef<HTMLDivElement>(null);
 
@@ -38,7 +36,6 @@ const ResizablePanel = (
             newSize = Math.max(minSize, newSize);
             if (direction === 'horizontal') {
                 newSize = Math.min(newSize, window.innerWidth - minSize);
-                // newSize = Math.min(newSize, containerRef.current.clientWidth - minSize);
             } else {
                 newSize = Math.min(newSize, window.innerHeight - minSize);
             }
@@ -53,11 +50,6 @@ const ResizablePanel = (
         document.addEventListener('mousemove', onMouseMove);
         document.addEventListener('mouseup', onMouseUp);
     };
-
-    // if (!left || !right) {
-    //     // return <div className={clsx(className, "h-full")}>{validChildren}</div>;
-    //     return <div className={clsx(className, "h-full")}>{left || right}</div>;
-    // }
 
     return (
         <div

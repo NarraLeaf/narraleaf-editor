@@ -1,6 +1,6 @@
 import {useEditor} from "@lib/providers/Editor";
 import {VerticalBox} from "@lib/utils/components";
-import {CharacterBrowserFolder} from "@lib/components/Editor/CharacterBrowserFolder";
+import {CharacterBrowserFolder} from "@lib/components/Editor/CharacterBrowser/CharacterBrowserFolder";
 
 export function CharacterBrowser() {
     const editor = useEditor();

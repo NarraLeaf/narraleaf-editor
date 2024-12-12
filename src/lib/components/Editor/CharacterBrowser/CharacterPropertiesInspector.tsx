@@ -1,4 +1,4 @@
-import { Character } from "@/lib/editor/app/elements/character";
+import { Character } from "@lib/editor/app/elements/character";
 
 export default function CharacterPropertiesInspector(
     {

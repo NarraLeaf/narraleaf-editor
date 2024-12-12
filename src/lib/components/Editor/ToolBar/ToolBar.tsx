@@ -1,6 +1,6 @@
 import React, {useEffect} from "react";
 import {useEditor} from "@lib/providers/Editor";
-import ToolBarGroup from "@lib/components/Editor/ToolBarGroup";
+import ToolBarGroup from "@lib/components/Editor/ToolBar/ToolBarGroup";
 import {HorizontalBox, useFlush} from "@lib/utils/components";
 
 export function ToolBar() {

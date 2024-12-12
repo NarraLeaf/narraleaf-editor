@@ -3,8 +3,8 @@ import React from "react";
 import {Character} from "@lib/editor/app/elements/character";
 import {useEditor} from "@lib/providers/Editor";
 import {SideBarPosition} from "@lib/editor/SideBar";
-import {SideBarItemsKeys} from "@lib/components/Editor/SideBarItemsRegistry";
-import CharacterPropertiesInspector from "@lib/components/Editor/CharacterPropertiesInspector";
+import {SideBarItemsKeys} from "@lib/components/Editor/SideBar/SideBarItemsRegistry";
+import CharacterPropertiesInspector from "@lib/components/Editor/CharacterBrowser/CharacterPropertiesInspector";
 import {ChevronDownIcon, ChevronRightIcon} from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import {useFlush} from "@lib/utils/components";
@@ -47,6 +47,7 @@ export function CharacterBrowserFolder(
         editor.GUIManger
             .requestSideBarFlush()
             .requestMainContentFlush();
+        flush();
         setOpen(true);
     }
 
@@ -68,15 +69,28 @@ export function CharacterBrowserFolder(
             {/*  list of characters  */}
             {open && (
                 <div className="px-2 py-1">
-                    {group.getCharacters().map((character, index) => (
-                        <div
-                            key={index}
-                            className={"flex justify-between items-center cursor-pointer bg-white hover:bg-gray-100"}
-                            onClick={() => inspectCharacter(character)}
-                        >
-                            <span className="text-gray-300">{character.config.name}</span>
-                        </div>
-                    ))}
+                    {group.getCharacters().map((character, index) => {
+                        const sideBar = editor.GUIManger.getSideBar(SideBarPosition.Bottom);
+                        const component =
+                            sideBar
+                                ?.getCurrent()
+                                ?.getComponent<{ character: Character }>();
+                        const selected =
+                            component?.type === CharacterPropertiesInspector && component.props.character === character;
+                        return (
+                            <div
+                                key={index}
+                                className={clsx("flex justify-between items-center cursor-pointer bg-white hover:bg-gray-100", {
+                                    "bg-gray-200": selected,
+                                })}
+                                onClick={() => inspectCharacter(character)}
+                            >
+                                <span className={clsx("text-black", {
+                                    "font-semibold": selected,
+                                })}>{character.config.name}</span>
+                            </div>
+                        );
+                    })}
                 </div>
             )}
         </>

@@ -3,7 +3,7 @@ import HelloPage from "@lib/components/Pages/Hello";
 import React from "react";
 import {Bars3BottomLeftIcon, MusicalNoteIcon, PencilIcon, UserIcon} from "@heroicons/react/24/outline";
 import PropertiesEmpty from "@lib/components/Pages/properties-empty";
-import {CharacterBrowser} from "@lib/components/Editor/CharacterBrowser";
+import {CharacterBrowser} from "@lib/components/Editor/CharacterBrowser/CharacterBrowser";
 
 export const SideBarItemsKeys = {
     scenes: "scenes",
