@@ -16,6 +16,8 @@ const ResizablePanel = (
         direction?: 'horizontal' | 'vertical';
         size: number;
         onResize: (size: number) => void;
+        // left: React.ReactNode;
+        // right: React.ReactNode;
     }>) => {
     const containerRef = React.useRef<HTMLDivElement>(null);
 
@@ -52,19 +54,10 @@ const ResizablePanel = (
         document.addEventListener('mouseup', onMouseUp);
     };
 
-    const validChildren =
-        React.Children.toArray(children).filter(child => {
-            // all elements are wrapped in a Fragment,
-            // we need to filter out the empty fragments
-            // @fixme: this is a hack, we should find a better way to handle this
-            if (React.isValidElement(child) && child.props.children !== null) {
-                return true;
-            }
-        });
-
-    if (validChildren.length < 2) {
-        return <div className={clsx(className, "h-full")}>{validChildren}</div>;
-    }
+    // if (!left || !right) {
+    //     // return <div className={clsx(className, "h-full")}>{validChildren}</div>;
+    //     return <div className={clsx(className, "h-full")}>{left || right}</div>;
+    // }
 
     return (
         <div
@@ -73,35 +66,38 @@ const ResizablePanel = (
             ref={containerRef}
         >
             {
-                React.Children.map(children, (child, index) => {
+                React.Children.toArray(children).map((child, index, arr) => {
                     if (index === 0) {
                         return (
-                            <div style={{
-                                width: direction === 'horizontal' ? `${size}px` : '100%',
-                                height: direction === 'vertical' ? `${size}px` : '100%'
-                            }}>
-                                {child}
-                            </div>
-                        )
-                    }
-                    if (index === 1) {
-                        return (
-                            <>
-                                <div
-                                    onMouseDown={handleMouseDown}
-                                    style={{
-                                        width: direction === 'horizontal' ? '2px' : '100%',
-                                        height: direction === 'vertical' ? '2px' : '100%',
-                                        cursor: direction === 'horizontal' ? 'col-resize' : 'row-resize',
-                                        background: '#e7e7e7',
-                                    }}
-                                ></div>
-                                <div style={{flex: 1}}>
+                            <React.Fragment key={index}>
+                                <div style={arr.length > 1 ? {
+                                    width: direction === 'horizontal' ? `${size}px` : '100%',
+                                    height: direction === 'vertical' ? `${size}px` : '100%'
+                                }: {
+                                    width: '100%',
+                                    height: '100%'
+                                }}>
                                     {child}
                                 </div>
-                            </>
+                            </React.Fragment>
                         )
                     }
+                    return (
+                        <React.Fragment key={index}>
+                            <div
+                                onMouseDown={handleMouseDown}
+                                style={{
+                                    width: direction === 'horizontal' ? '2px' : '100%',
+                                    height: direction === 'vertical' ? '2px' : '100%',
+                                    cursor: direction === 'horizontal' ? 'col-resize' : 'row-resize',
+                                    background: '#e7e7e7',
+                                }}
+                            ></div>
+                            <div style={{flex: 1}}>
+                                {child}
+                            </div>
+                        </React.Fragment>
+                    )
                 })
             }
         </div>

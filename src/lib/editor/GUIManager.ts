@@ -94,15 +94,7 @@ export class GUIManager {
             return null;
         }
         if (SideBar.isSideBar(this.data.main[side])) {
-            const component = this.data.main[side].getCurrent()?.getComponent();
-            return [component || null]
-                .map((c, index) => {
-                    return React.createElement(
-                        React.Fragment,
-                        {key: index},
-                        c
-                    )
-                });
+            return this.data.main[side].getCurrent()?.getComponent() || null;
         }
         if (React.isValidElement(this.data.main[side])) {
             return this.data.main[side];

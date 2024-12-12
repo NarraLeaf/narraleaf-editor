@@ -60,7 +60,8 @@ function MainContent(
     return (
         <>
             <ResizablePanel direction={"vertical"} size={getHeight(bottomPanelSize)} onResize={setBottomPanelSize}>
-                <ResizablePanel direction={"horizontal"} size={getWidth(leftPanelSize)} onResize={setLeftPanelSize}>
+                <ResizablePanel direction={"horizontal"} size={getWidth(leftPanelSize)} onResize={setLeftPanelSize}
+                                key={"$0"}>
                     <ResizablePanel direction={"horizontal"} size={getWidth(rightPanelSize)}
                                     onResize={setRightPanelSize}>
                         {editor.GUIManger.renderMainContent(MainContentPosition.Left)}
@@ -138,7 +139,7 @@ export function Editor() {
                     </VerticalBox>
 
                     {/* main Content */}
-                    <MainContent containerRef={containerRef} />
+                    <MainContent containerRef={containerRef}/>
                 </HorizontalBox>
 
             </VerticalBox>
