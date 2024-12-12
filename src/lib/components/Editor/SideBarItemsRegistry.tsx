@@ -20,21 +20,21 @@ export const SideBarItemsRegistry: {
     [SideBarPosition.Left]: {
         [SideBarItemsKeys.scenes]: new SideBarItem({
             name: "Scenes",
-            component: () => <div className={"h-full w-full bg-gray-100"}>Test</div>,
+            component: <div className={"h-full w-full bg-gray-100"}>Test</div>,
             icon: (
                 <PencilIcon width={24}/>
             ),
         }),
         [SideBarItemsKeys.characters]: new SideBarItem({
             name: "Characters",
-            component: () => <CharacterBrowser/>,
+            component: <CharacterBrowser/>,
             icon: (
                 <UserIcon width={24}/>
             ),
         }),
         [SideBarItemsKeys.sounds]: new SideBarItem({
             name: "Sounds",
-            component: () => <HelloPage/>,
+            component: <HelloPage/>,
             icon: (
                 <MusicalNoteIcon width={24}/>
             ),
@@ -43,7 +43,7 @@ export const SideBarItemsRegistry: {
     [SideBarPosition.Bottom]: {
         [SideBarItemsKeys.properties]: new SideBarItem({
             name: "Properties",
-            component: () => <PropertiesEmpty/>,
+            component: <PropertiesEmpty/>,
             icon: (
                 <Bars3BottomLeftIcon width={24}/>
             ),

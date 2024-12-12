@@ -39,7 +39,7 @@ export function CharacterBrowserFolder(
             .getSideBar(SideBarPosition.Bottom)
             ?.get(SideBarItemsKeys.properties)
             ?.setComponent(
-                () => <CharacterPropertiesInspector character={character}/>
+                <CharacterPropertiesInspector character={character}/>
             );
         editor.GUIManger
             .getSideBar(SideBarPosition.Bottom)

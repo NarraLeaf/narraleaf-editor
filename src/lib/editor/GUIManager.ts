@@ -95,11 +95,11 @@ export class GUIManager {
         }
         if (SideBar.isSideBar(this.data.main[side])) {
             const component = this.data.main[side].getCurrent()?.getComponent();
-            return [component?.({}) || null]
+            return [component || null]
                 .map((c, index) => {
                     return React.createElement(
                         React.Fragment,
-                        {key: component?.displayName || index},
+                        {key: index},
                         c
                     )
                 });
