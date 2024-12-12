@@ -22,10 +22,30 @@ export enum MainContentPosition {
     Center = "center",
 }
 
+type GUIManagerEvents = {
+    "event:editor.requestFlush": [];
+    "event:editor.toolBar.requestFlush": [];
+    "event:editor.sideBar.requestFlush": [];
+    "event:editor.mainContent.requestFlush": [];
+};
+
 export class GUIManager {
-    readonly events: EventEmitter<{
-        "event:editor.requestFlush": [];
-    }> = new EventEmitter();
+    public static Events = {
+        editor: {
+            requestFlush: "event:editor.requestFlush",
+            toolBar: {
+                requestFlush: "event:editor.toolBar.requestFlush",
+            },
+            sideBar: {
+                requestFlush: "event:editor.sideBar.requestFlush",
+            },
+            mainContent: {
+                requestFlush: "event:editor.mainContent.requestFlush",
+            },
+        }
+    } as const;
+
+    readonly events: EventEmitter<GUIManagerEvents> = new EventEmitter();
     private data: GUIData;
     private updateCounter: number = 0;
 
@@ -74,7 +94,15 @@ export class GUIManager {
             return null;
         }
         if (SideBar.isSideBar(this.data.main[side])) {
-            return this.data.main[side].getCurrent()?.getComponent() || null;
+            const component = this.data.main[side].getCurrent()?.getComponent();
+            return [component?.({}) || null]
+                .map((c, index) => {
+                    return React.createElement(
+                        React.Fragment,
+                        {key: component?.displayName || index},
+                        c
+                    )
+                });
         }
         if (React.isValidElement(this.data.main[side])) {
             return this.data.main[side];
@@ -84,17 +112,17 @@ export class GUIManager {
 
     public setMainContent(side: MainContentPosition, content: MainContent): this {
         this.data.main[side] = content;
-        return this.requestFlush();
+        return this.requestMainContentFlush();
     }
 
     public registerToolBarGroup(key: string, config: ToolBarGroup): this {
         this.data.toolbar[key] = config;
-        return this.requestFlush();
+        return this.requestToolBarFlush();
     }
 
     public unregisterToolBarGroup(key: string): this {
         delete this.data.toolbar[key];
-        return this.requestFlush();
+        return this.requestToolBarFlush();
     }
 
     public getToolBarGroup(key: string): ToolBarGroup | null {
@@ -127,22 +155,64 @@ export class GUIManager {
         };
     }
 
+    /**
+     * Request a flush of the whole GUI
+     *
+     * If you want to update some part of the GUI, you should use the specific methods.
+     */
     public requestFlush(): this {
-        this.events.emit("event:editor.requestFlush");
-        return this;
+        return this.emitEvent(GUIManager.Events.editor.requestFlush);
     }
 
+    /**
+     * Request a flush of the whole GUI and GUI-related hooks
+     *
+     * **Using this method may cause performance issues, use it only when necessary**
+     */
     public requestElevatedFlush(): this {
         this.updateCounter++;
         return this.requestFlush();
     }
 
     public onRequestFlush(callback: () => void): EditorEventToken {
-        this.events.on("event:editor.requestFlush", callback);
+        return this.wrapEvent(GUIManager.Events.editor.requestFlush, callback);
+    }
+
+    public requestToolBarFlush(): this {
+        return this.emitEvent(GUIManager.Events.editor.toolBar.requestFlush);
+    }
+
+    public onRequestToolBarFlush(callback: () => void): EditorEventToken {
+        return this.wrapEvent(GUIManager.Events.editor.toolBar.requestFlush, callback);
+    }
+
+    public requestSideBarFlush(): this {
+        return this.emitEvent(GUIManager.Events.editor.sideBar.requestFlush);
+    }
+
+    public onRequestSideBarFlush(callback: () => void): EditorEventToken {
+        return this.wrapEvent(GUIManager.Events.editor.sideBar.requestFlush, callback);
+    }
+
+    public requestMainContentFlush(): this {
+        return this.emitEvent(GUIManager.Events.editor.mainContent.requestFlush);
+    }
+
+    public onRequestMainContentFlush(callback: () => void): EditorEventToken {
+        return this.wrapEvent(GUIManager.Events.editor.mainContent.requestFlush, callback);
+    }
+
+    private wrapEvent(key: keyof GUIManagerEvents, callback: () => void): EditorEventToken {
+        this.events.on(key, callback);
         return {
             off: () => {
-                this.events.off("event:editor.requestFlush", callback);
+                this.events.off(key, callback);
             }
         };
+    }
+
+    private emitEvent(key: keyof GUIManagerEvents): this {
+        this.events.emit(key);
+        return this;
     }
 }

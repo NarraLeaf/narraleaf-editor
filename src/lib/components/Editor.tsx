@@ -12,21 +12,76 @@ import {WindowEventAnnouncer} from "@lib/components/WindowEventAnnouncer";
 import {HorizontalBox, useFlush, VerticalBox} from "@lib/utils/components";
 import {SideBarItemsRegistry} from "@lib/components/Editor/SideBarItemsRegistry";
 
-
-export function Editor() {
+function MainContent(
+    {
+        containerRef,
+    }: Readonly<{
+        containerRef: React.RefObject<HTMLDivElement>;
+    }>,
+) {
     const editor = useEditor();
     const flush = useFlush();
-    const containerRef = React.useRef<HTMLDivElement>(null);
-    const [containerWidth, setContainerWidth] = React.useState(0);
-    const [containerHeight, setContainerHeight] = React.useState(0);
-
+    const [
+        {containerWidth, containerHeight},
+        setContainerSize
+    ] = React.useState({containerWidth: 0, containerHeight: 0});
     const [bottomPanelSize, setBottomPanelSize] = React.useState(200);
     const [leftPanelSize, setLeftPanelSize] = React.useState(200);
     const [rightPanelSize, setRightPanelSize] = React.useState(200);
 
     useEffect(() => {
+        if (containerRef.current) {
+            setContainerSize({
+                containerWidth: containerRef.current.clientWidth,
+                containerHeight: containerRef.current.clientHeight
+            });
+        }
+        return editor.onResize(() => {
+            if (containerRef.current) {
+                setContainerSize({
+                    containerWidth: containerRef.current.clientWidth,
+                    containerHeight: containerRef.current.clientHeight
+                });
+            }
+        }).off;
+    }, []);
+
+    useEffect(() => {
+        return editor.GUIManger.onRequestMainContentFlush(flush).off;
+    }, [...editor.GUIManger.deps]);
+
+    const getHeight = (expected: number) => {
+        return Math.min(containerHeight - 100, expected);
+    };
+    const getWidth = (expected: number) => {
+        return Math.min(containerWidth - 100, expected);
+    };
+
+    return (
+        <>
+            <ResizablePanel direction={"vertical"} size={getHeight(bottomPanelSize)} onResize={setBottomPanelSize}>
+                <ResizablePanel direction={"horizontal"} size={getWidth(leftPanelSize)} onResize={setLeftPanelSize}>
+                    <ResizablePanel direction={"horizontal"} size={getWidth(rightPanelSize)}
+                                    onResize={setRightPanelSize}>
+                        {editor.GUIManger.renderMainContent(MainContentPosition.Left)}
+                        {editor.GUIManger.renderMainContent(MainContentPosition.Center)}
+                    </ResizablePanel>
+                    {editor.GUIManger.renderMainContent(MainContentPosition.Right)}
+                </ResizablePanel>
+                {editor.GUIManger.renderMainContent(MainContentPosition.Bottom)}
+            </ResizablePanel>
+        </>
+    );
+}
+
+export function Editor() {
+    const editor = useEditor();
+    const flush = useFlush();
+    const containerRef = React.useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
         return editor.GUIManger.onRequestFlush(flush).off;
-    }, [editor.GUIManger, flush])
+    }, [...editor.GUIManger.deps]);
 
     useEffect(() => {
         Object.entries(ToolBarGroups).forEach(([key, group]) => {
@@ -58,24 +113,8 @@ export function Editor() {
     }, [...editor.GUIManger.deps]);
 
     useEffect(() => {
-        if (containerRef.current) {
-            setContainerWidth(containerRef.current.clientWidth);
-            setContainerHeight(containerRef.current.clientHeight);
-        }
-        return editor.onResize(() => {
-            if (containerRef.current) {
-                setContainerWidth(containerRef.current.clientWidth);
-                setContainerHeight(containerRef.current.clientHeight);
-            }
-        }).off;
-    }, []);
-
-    const getHeight = (expected: number) => {
-        return Math.min(containerHeight - 100, expected);
-    };
-    const getWidth = (expected: number) => {
-        return Math.min(containerWidth - 100, expected);
-    };
+        editor.GUIManger.requestFlush();
+    }, [...editor.GUIManger.deps]);
 
     return (
         <>
@@ -99,16 +138,7 @@ export function Editor() {
                     </VerticalBox>
 
                     {/* main Content */}
-                    <ResizablePanel direction={"vertical"} size={getHeight(bottomPanelSize)} onResize={setBottomPanelSize}>
-                        <ResizablePanel direction={"horizontal"} size={getWidth(leftPanelSize)} onResize={setLeftPanelSize}>
-                            <ResizablePanel direction={"horizontal"} size={getWidth(rightPanelSize)} onResize={setRightPanelSize}>
-                                {editor.GUIManger.renderMainContent(MainContentPosition.Left)}
-                                {editor.GUIManger.renderMainContent(MainContentPosition.Center)}
-                            </ResizablePanel>
-                            {editor.GUIManger.renderMainContent(MainContentPosition.Right)}
-                        </ResizablePanel>
-                        {editor.GUIManger.renderMainContent(MainContentPosition.Bottom)}
-                    </ResizablePanel>
+                    <MainContent containerRef={containerRef} />
                 </HorizontalBox>
 
             </VerticalBox>

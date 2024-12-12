@@ -19,11 +19,15 @@ export function SideBarItem(
     const handleSelectItem = (item: string) => {
         if (sideBar.getCurrentKey() === item) {
             sideBar.setCurrent(null);
-            editor.GUIManger.requestFlush();
+            editor.GUIManger
+                .requestMainContentFlush()
+                .requestSideBarFlush();
             return;
         }
         sideBar.setCurrent(item);
-        editor.GUIManger.requestFlush();
+        editor.GUIManger
+            .requestMainContentFlush()
+            .requestSideBarFlush();
 
         console.debug("[SideBar] selected item: ", item); // @debug
     }

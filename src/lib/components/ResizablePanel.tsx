@@ -52,8 +52,18 @@ const ResizablePanel = (
         document.addEventListener('mouseup', onMouseUp);
     };
 
-    if (React.Children.toArray(children).length < 2) {
-        return <div className={clsx(className, "h-full")}>{children}</div>;
+    const validChildren =
+        React.Children.toArray(children).filter(child => {
+            // all elements are wrapped in a Fragment,
+            // we need to filter out the empty fragments
+            // @fixme: this is a hack, we should find a better way to handle this
+            if (React.isValidElement(child) && child.props.children !== null) {
+                return true;
+            }
+        });
+
+    if (validChildren.length < 2) {
+        return <div className={clsx(className, "h-full")}>{validChildren}</div>;
     }
 
     return (

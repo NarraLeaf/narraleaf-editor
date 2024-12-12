@@ -1,41 +1,32 @@
 import {Editor} from "@lib/editor/editor";
-import {Character, CharacterConfig} from "@lib/editor/app/elements/character";
-import {Image} from "@lib/editor/app/elements/image";
 import {SrcManager} from "@lib/editor/app/srcManager";
+import {ImageManager} from "@lib/editor/app/imageManager";
+import {CharacterManager} from "@lib/editor/app/characterManager";
 
 type ProjectConfig = {
     editor: Editor;
+    name: string;
 };
 
 export class Project {
+    public readonly sources = new SrcManager();
+    public readonly characters: CharacterManager = new CharacterManager();
+    public readonly images: ImageManager = new ImageManager();
     private config: ProjectConfig;
-    private characters: Character[] = [];
-    private images: Image[] = [];
-    public readonly srcManager = new SrcManager();
 
     public constructor(config: ProjectConfig) {
         this.config = config;
     }
 
-    public addCharacter(character: Character | CharacterConfig): this {
-        if (Character.isCharacter(character)) {
-            this.characters.push(character);
-        } else {
-            this.characters.push(new Character(character));
-        }
-        return this;
+    public getSourceManager(): SrcManager {
+        return this.sources;
     }
 
-    public getCharacters(): Character[] {
-        return [...this.characters];
+    public getCharacterManager(): CharacterManager {
+        return this.characters;
     }
 
-    public addImage(image: Image): this {
-        this.images.push(image);
-        return this;
-    }
-
-    public getImages(): Image[] {
-        return [...this.images];
+    public getImageManager(): ImageManager {
+        return this.images;
     }
 }

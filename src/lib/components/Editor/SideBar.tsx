@@ -1,8 +1,9 @@
 import React from "react";
-import {VerticalBox} from "@lib/utils/components";
+import {useFlush, VerticalBox} from "@lib/utils/components";
 import {SideBar as EditorSideBar} from "@lib/editor/SideBar";
 import clsx from "clsx";
 import {SideBarItem} from "@lib/components/Editor/SideBarItem";
+import {useEditor} from "@lib/providers/Editor";
 
 
 export default function SideBar(
@@ -14,6 +15,13 @@ export default function SideBar(
         className?: string;
     }>
 ) {
+    const editor = useEditor();
+    const flush = useFlush();
+
+    React.useEffect(() => {
+        return editor.GUIManger.onRequestSideBarFlush(flush).off;
+    }, [...editor.GUIManger.deps]);
+
     if (!sideBar) {
         return null;
     }

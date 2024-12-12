@@ -1,10 +1,15 @@
-import React from "react";
+import React, {useEffect} from "react";
 import {useEditor} from "@lib/providers/Editor";
 import ToolBarGroup from "@lib/components/Editor/ToolBarGroup";
-import {HorizontalBox} from "@lib/utils/components";
+import {HorizontalBox, useFlush} from "@lib/utils/components";
 
 export function ToolBar() {
     const editor = useEditor();
+    const flush = useFlush();
+
+    useEffect(() => {
+        return editor.GUIManger.onRequestToolBarFlush(flush).off;
+    }, [...editor.GUIManger.deps]);
 
     const {left, right} = editor.GUIManger.getToolBarGroupsByPosition();
 

@@ -2,6 +2,7 @@ import {GUIManager} from "./GUIManager";
 import {EventEmitter} from "events";
 import {EditorEventToken} from "@lib/editor/type";
 import React from "react";
+import {Project} from "@lib/editor/app/project";
 
 
 export class Editor {
@@ -48,6 +49,11 @@ export class Editor {
 
     public GUIManger = new GUIManager();
     public events: EventEmitter = new EventEmitter();
+    private project: Project;
+
+    constructor() {
+        this.project = this.getNewProject("Untitled");
+    }
 
     public onKeyPress(key: React.KeyboardEvent["key"], callback: () => void): EditorEventToken {
         this.events.on(Editor.Events.Editor.KeyPressed, (k) => {
@@ -69,5 +75,21 @@ export class Editor {
                 this.events.off(Editor.Events.Editor.Resize, callback);
             }
         };
+    }
+
+    public getProject(): Project {
+        return this.project;
+    }
+
+    public getNewProject(name: string): Project {
+        return new Project({
+            editor: this,
+            name: name,
+        });
+    }
+
+    public setProject(project: Project): this {
+        this.project = project;
+        return this;
     }
 }

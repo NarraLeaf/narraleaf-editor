@@ -9,8 +9,13 @@ export class Character {
     public static isCharacter(obj: any): obj is Character {
         return obj instanceof Character;
     }
+    public static newCharacter(name?: string): Character {
+        return new Character({
+            name: name || null,
+        });
+    }
 
-    private config: CharacterConfig;
+    public config: CharacterConfig;
     private readonly gameCharacter: GameCharacter;
 
     constructor(config: CharacterConfig) {

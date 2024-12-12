@@ -5,7 +5,7 @@ type SideBarRegistry = {
 };
 export type SideBarConfig = {
     name: string;
-    component: React.ReactNode;
+    component: React.FunctionComponent;
     icon: React.ReactNode;
 };
 type SideBarState = {
@@ -30,12 +30,17 @@ export class SideBarItem {
         return this.data.name;
     }
 
-    public getComponent(): React.ReactNode {
+    public getComponent(): React.FunctionComponent {
         return this.data.component;
     }
 
     public getIcon(): React.ReactNode {
         return this.data.icon;
+    }
+
+    public setComponent(component: React.FunctionComponent): this {
+        this.data.component = component;
+        return this;
     }
 }
 
@@ -67,6 +72,10 @@ export class SideBar {
         }
         this.data.current = key;
         return this;
+    }
+
+    public get(key: string): SideBarItem | null {
+        return this.data.registry[key] || null;
     }
 
     public register(key: string, config: SideBarItem): this {
