@@ -54,12 +54,12 @@ export function CharacterBrowserFolder(
     return (
         <>
             <div
-                className={clsx("flex justify-between items-center px-2 py-1 cursor-pointer w-full select-none", {
+                className={clsx("flex justify-between items-center px-2 py-1 cursor-pointer w-full select-none hover:bg-gray-100", {
                     "bg-gray-50": open,
                 })}
                 onClick={triggerOpen}
             >
-                <div className={clsx("text-gray-300 flex items-center hover:bg-gray-100")}>
+                <div className={clsx("text-gray-300 flex items-center")}>
                     {open ? <ChevronDownIcon className="w-4 h-4 mr-1"/> : <ChevronRightIcon className="w-4 h-4 mr-1"/>}
                     {name}
                 </div>
@@ -85,7 +85,7 @@ export function CharacterBrowserFolder(
                                 })}
                                 onClick={() => inspectCharacter(character)}
                             >
-                                <span className={clsx("text-black", {
+                                <span className={clsx("text-black select-none", {
                                     "font-semibold": selected,
                                 })}>{character.config.name}</span>
                             </div>

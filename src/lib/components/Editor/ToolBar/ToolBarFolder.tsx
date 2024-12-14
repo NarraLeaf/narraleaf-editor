@@ -88,7 +88,7 @@ export default function ToolBarFolder({
             </div>
 
             {open && (
-                <div className={"fixed mt-8 bg-gray-100 w-64"} ref={menuRef}>
+                <div className={"fixed mt-8 shadow-md bg-white w-64"} ref={menuRef}>
                     <ul
                         className={"flex flex-col"}
                         onMouseUp={handleMouseUp}

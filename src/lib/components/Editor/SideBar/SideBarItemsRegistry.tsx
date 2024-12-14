@@ -4,12 +4,14 @@ import React from "react";
 import {Bars3BottomLeftIcon, MusicalNoteIcon, PencilIcon, UserIcon} from "@heroicons/react/24/outline";
 import PropertiesEmpty from "@lib/components/Pages/properties-empty";
 import {CharacterBrowser} from "@lib/components/Editor/CharacterBrowser/CharacterBrowser";
+import EmptySceneSelected from "@lib/components/Pages/EmptySceneSelected";
 
 export const SideBarItemsKeys = {
     scenes: "scenes",
     characters: "characters",
     sounds: "sounds",
     properties: "properties",
+    scripts: "scripts",
 }
 
 export const SideBarItemsRegistry: {
@@ -44,6 +46,15 @@ export const SideBarItemsRegistry: {
         [SideBarItemsKeys.properties]: new SideBarItem({
             name: "Properties",
             component: <PropertiesEmpty/>,
+            icon: (
+                <Bars3BottomLeftIcon width={24}/>
+            ),
+        }),
+    },
+    [SideBarPosition.Right]: {
+        [SideBarItemsKeys.scripts]: new SideBarItem({
+            name: "Scripts",
+            component: <EmptySceneSelected/>,
             icon: (
                 <Bars3BottomLeftIcon width={24}/>
             ),

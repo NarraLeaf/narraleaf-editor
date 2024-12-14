@@ -25,9 +25,6 @@ function MainContent(
         {containerWidth, containerHeight},
         setContainerSize
     ] = React.useState({containerWidth: 0, containerHeight: 0});
-    const [bottomPanelSize, setBottomPanelSize] = React.useState(200);
-    const [leftPanelSize, setLeftPanelSize] = React.useState(200);
-    const [rightPanelSize, setRightPanelSize] = React.useState(200);
 
     useEffect(() => {
         if (containerRef.current) {
@@ -51,18 +48,28 @@ function MainContent(
     }, [...editor.GUIManger.deps]);
 
     const getHeight = (expected: number) => {
-        return Math.min(containerHeight - 100, expected);
+        return Math.min(containerHeight - 250, expected);
     };
     const getWidth = (expected: number) => {
-        return Math.min(containerWidth - 100, expected);
+        return Math.min(containerWidth - 250, expected);
     };
 
     return (
         <>
-            <ResizablePanel direction={"vertical"} size={getHeight(bottomPanelSize)} onResize={setBottomPanelSize}>
-                <ResizablePanel direction={"horizontal"} size={getWidth(leftPanelSize)} onResize={setLeftPanelSize}>
-                    <ResizablePanel direction={"horizontal"} size={getWidth(rightPanelSize)}
-                                    onResize={setRightPanelSize}>
+            <ResizablePanel
+                direction={"vertical"}
+                className={"overflow-hidden"}
+                minSize={getHeight(250)}
+            >
+                <ResizablePanel
+                    direction={"horizontal"}
+                    minSize={250}
+                    reverse
+                >
+                    <ResizablePanel
+                        direction={"horizontal"}
+                        minSize={getWidth(250)}
+                    >
                         {editor.GUIManger.renderMainContent(MainContentPosition.Left)}
                         {editor.GUIManger.renderMainContent(MainContentPosition.Center)}
                     </ResizablePanel>
@@ -128,7 +135,7 @@ export function Editor() {
                 </VerticalBox>
 
                 {/* left: left/bottom sidebars; right: main Content */}
-                <HorizontalBox className={"h-full"}>
+                <HorizontalBox className={"h-full max-w-full"}>
 
                     {/* sidebars */}
                     <VerticalBox className={"w-16 h-full place-content-between border-gray-200 border-[1px]"}>
@@ -139,6 +146,10 @@ export function Editor() {
 
                     {/* main Content */}
                     <MainContent containerRef={containerRef}/>
+
+                    {/* right sidebar */}
+                    <SideBar className={"h-full w-16 max-w-16 border-gray-200 border-[1px]"}
+                             sideBar={editor.GUIManger.getSideBar(SideBarPosition.Right)}/>
                 </HorizontalBox>
 
             </VerticalBox>

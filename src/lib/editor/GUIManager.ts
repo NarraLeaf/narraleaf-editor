@@ -65,7 +65,7 @@ export class GUIManager {
             sidebar: sideBars,
             main: {
                 left: sideBars.left,
-                right: null,
+                right: sideBars.right,
                 bottom: sideBars.bottom,
                 center: null,
             },

@@ -5,23 +5,20 @@ const ResizablePanel = (
     {
         children,
         className,
-        minSize = 100,
         direction = 'vertical',
-        size,
-        onResize,
+        reverse,
+        minSize = 100,
+        defaultSize = 200,
     }: Readonly<{
         children: React.ReactNode;
         className?: string;
-        minSize?: number;
         direction?: 'horizontal' | 'vertical';
-        size: number;
-        onResize: (size: number) => void;
+        reverse?: boolean;
+        minSize?: number;
+        defaultSize?: number;
     }>) => {
     const containerRef = React.useRef<HTMLDivElement>(null);
-
-    function setSize(size: number) {
-        onResize(size);
-    }
+    const [size, setSize] = React.useState(Math.max(minSize, defaultSize));
 
     const handleMouseDown = (e: React.MouseEvent) => {
         const startPos = direction === 'horizontal' ? e.clientX : e.clientY;
@@ -32,7 +29,10 @@ const ResizablePanel = (
                 return;
             }
 
-            let newSize = startSize + (direction === 'horizontal' ? e.clientX - startPos : e.clientY - startPos);
+            // let newSize = startSize + (direction === 'horizontal' ? e.clientX - startPos : e.clientY - startPos);
+            let newSize = reverse
+                ? startSize - (direction === 'horizontal' ? e.clientX - startPos : e.clientY - startPos)
+                : startSize + (direction === 'horizontal' ? e.clientX - startPos : e.clientY - startPos);
             newSize = Math.max(minSize, newSize);
             if (direction === 'horizontal') {
                 newSize = Math.min(newSize, window.innerWidth - minSize);
@@ -51,6 +51,11 @@ const ResizablePanel = (
         document.addEventListener('mouseup', onMouseUp);
     };
 
+    const style = {
+        width: direction === 'horizontal' ? `${Math.max(minSize, size)}px` : '100%',
+        height: direction === 'vertical' ? `${Math.max(minSize, size)}px` : '100%',
+    };
+
     return (
         <div
             style={{flexDirection: direction === 'horizontal' ? 'row' : 'column'}}
@@ -62,13 +67,12 @@ const ResizablePanel = (
                     if (index === 0) {
                         return (
                             <React.Fragment key={index}>
-                                <div style={arr.length > 1 ? {
-                                    width: direction === 'horizontal' ? `${size}px` : '100%',
-                                    height: direction === 'vertical' ? `${size}px` : '100%'
-                                }: {
-                                    width: '100%',
-                                    height: '100%'
-                                }}>
+                                <div
+                                    className={"w-full h-full"}
+                                    style={arr.length > 1 && !reverse ? style : {
+                                        flex: 1,
+                                    }}
+                                >
                                     {child}
                                 </div>
                             </React.Fragment>
@@ -85,7 +89,9 @@ const ResizablePanel = (
                                     background: '#e7e7e7',
                                 }}
                             ></div>
-                            <div style={{flex: 1}}>
+                            <div style={reverse? style : {
+                                flex: 1
+                            }}>
                                 {child}
                             </div>
                         </React.Fragment>
