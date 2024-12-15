@@ -1,6 +1,6 @@
 import {GUIManager} from "./GUIManager";
 import {EventEmitter} from "events";
-import {EditorEventToken} from "@lib/editor/type";
+import {EditorEventToken, IGUIEventContext} from "@lib/editor/type";
 import React from "react";
 import {Project} from "@lib/editor/app/project";
 
@@ -40,11 +40,19 @@ export class Editor {
         F11: "F11",
         F12: "F12",
     };
+    public static Constants = {
+        ContextMenuPrefix: "__EditorContextMenu__",
+    } as const;
     public static Events = {
         Editor: {
             KeyPressed: "event:editor.keyPressed",
             Resize: "event:editor.resize",
         },
+    }
+    public static getCtx(editor: Editor): IGUIEventContext {
+        return {
+            editor,
+        } satisfies IGUIEventContext;
     }
 
     public GUIManger = new GUIManager();

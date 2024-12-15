@@ -1,4 +1,4 @@
-import {Editor} from "@lib/editor/editor";
+import {IGUIEventContext} from "@lib/editor/type";
 
 export type ToolBarRegistry = Record<string, ToolBarGroup> & object;
 
@@ -18,7 +18,7 @@ type ToolBarFolderConfig = {
 };
 type ToolBarItemConfig = {
     name: string;
-    onClick: (ctx: IToolBarItemOnClickCtx) => void;
+    onClick: (ctx: IGUIEventContext) => void;
 };
 
 export class ToolBarGroup {
@@ -67,10 +67,6 @@ export class ToolBarFolder {
     }
 }
 
-export interface IToolBarItemOnClickCtx {
-    editor: Editor;
-}
-
 export class ToolBarItem {
     private data: ToolBarItemConfig;
 
@@ -82,7 +78,7 @@ export class ToolBarItem {
         return this.data.name;
     }
 
-    public onClick(ctx: IToolBarItemOnClickCtx): void {
+    public onClick(ctx: IGUIEventContext): void {
         this.data.onClick(ctx);
     }
 }

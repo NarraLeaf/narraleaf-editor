@@ -10,7 +10,7 @@ const ResizablePanel = (
         minSize = 100,
         defaultSize = 200,
     }: Readonly<{
-        children: React.ReactNode;
+        children: (React.ReactElement | React.ReactElement[] | undefined | null)[];
         className?: string;
         direction?: 'horizontal' | 'vertical';
         reverse?: boolean;
@@ -29,7 +29,6 @@ const ResizablePanel = (
                 return;
             }
 
-            // let newSize = startSize + (direction === 'horizontal' ? e.clientX - startPos : e.clientY - startPos);
             let newSize = reverse
                 ? startSize - (direction === 'horizontal' ? e.clientX - startPos : e.clientY - startPos)
                 : startSize + (direction === 'horizontal' ? e.clientX - startPos : e.clientY - startPos);
@@ -56,6 +55,13 @@ const ResizablePanel = (
         height: direction === 'vertical' ? `${Math.max(minSize, size)}px` : '100%',
     };
 
+    const childrenArray = React.Children.toArray(children) as
+        React.ReactElement<React.ClassAttributes<HTMLDivElement> & {
+            hidden?: boolean;
+        }>[];
+    const displayChildren =
+        childrenArray.filter(child => child.props.hidden !== true);
+
     return (
         <div
             style={{flexDirection: direction === 'horizontal' ? 'row' : 'column'}}
@@ -63,13 +69,13 @@ const ResizablePanel = (
             ref={containerRef}
         >
             {
-                React.Children.toArray(children).map((child, index, arr) => {
-                    if (index === 0) {
+                childrenArray.map((child, index) => {
+                    if (child === displayChildren[0]) {
                         return (
                             <React.Fragment key={index}>
                                 <div
                                     className={"w-full h-full"}
-                                    style={arr.length > 1 && !reverse ? style : {
+                                    style={(!reverse) ? style : {
                                         flex: 1,
                                     }}
                                 >
@@ -78,10 +84,22 @@ const ResizablePanel = (
                             </React.Fragment>
                         )
                     }
+                    if (child.props.hidden === true) {
+                        return (
+                            <React.Fragment key={index}>
+                                <div style={{
+                                    display: "none",
+                                    flex: 0,
+                                }} hidden>
+                                    {child}
+                                </div>
+                            </React.Fragment>
+                        );
+                    }
                     return (
                         <React.Fragment key={index}>
                             <div
-                                onMouseDown={handleMouseDown}
+                                onMouseDown={(e) => handleMouseDown(e)}
                                 style={{
                                     width: direction === 'horizontal' ? '2px' : '100%',
                                     height: direction === 'vertical' ? '2px' : '100%',
@@ -89,7 +107,7 @@ const ResizablePanel = (
                                     background: '#e7e7e7',
                                 }}
                             ></div>
-                            <div style={reverse? style : {
+                            <div style={reverse ? style : {
                                 flex: 1
                             }}>
                                 {child}

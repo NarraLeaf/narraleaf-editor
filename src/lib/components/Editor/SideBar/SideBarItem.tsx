@@ -28,8 +28,6 @@ export function SideBarItem(
         editor.GUIManger
             .requestMainContentFlush()
             .requestSideBarFlush();
-
-        console.debug("[SideBar] selected item: ", item); // @debug
     }
 
     return (

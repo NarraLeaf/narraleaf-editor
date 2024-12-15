@@ -5,7 +5,7 @@ type SideBarRegistry = {
 };
 export type SideBarConfig = {
     name: string;
-    component: React.FunctionComponentElement<unknown>;
+    component: React.FunctionComponentElement<unknown> | null;
     icon: React.ReactNode;
 };
 type SideBarState = {
@@ -30,16 +30,21 @@ export class SideBarItem {
         return this.data.name;
     }
 
-    public getComponent<T extends Record<string, any>>(): React.FunctionComponentElement<T> {
-        return this.data.component as React.FunctionComponentElement<T>;
+    public getComponent<T extends Record<string, any>>(): React.FunctionComponentElement<T> | null {
+        return this.data.component as React.FunctionComponentElement<T> | null;
     }
 
     public getIcon(): React.ReactNode {
         return this.data.icon;
     }
 
-    public setComponent(component: React.FunctionComponentElement<unknown>): this {
+    public setComponent(component: React.FunctionComponentElement<unknown> | null): this {
         this.data.component = component;
+        return this;
+    }
+
+    public clearComponent(): this {
+        this.data.component = null;
         return this;
     }
 }
@@ -74,6 +79,11 @@ export class SideBar {
         return this;
     }
 
+    public hide(): this {
+        this.data.current = null;
+        return this;
+    }
+
     public get(key: string): SideBarItem | null {
         return this.data.registry[key] || null;
     }
@@ -85,5 +95,9 @@ export class SideBar {
 
     public entries(): [string, SideBarItem][] {
         return Object.entries(this.data.registry);
+    }
+
+    public isCurrentComponent(component: React.FunctionComponent<any>): boolean {
+        return this.getCurrent()?.getComponent()?.type === component;
     }
 }

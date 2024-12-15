@@ -2,7 +2,8 @@ import {Character as GameCharacter} from "narraleaf-react";
 
 
 export type CharacterConfig = {
-    name: string | null;
+    name: string;
+    isNarrator: boolean;
 };
 
 export class Character {
@@ -11,7 +12,14 @@ export class Character {
     }
     public static newCharacter(name?: string): Character {
         return new Character({
-            name: name || null,
+            name: name || "New Character",
+            isNarrator: false,
+        });
+    }
+    public static createNarrator(): Character {
+        return new Character({
+            name: "Narrator",
+            isNarrator: true,
         });
     }
 

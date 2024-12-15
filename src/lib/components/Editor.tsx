@@ -60,6 +60,7 @@ function MainContent(
                 direction={"vertical"}
                 className={"overflow-hidden"}
                 minSize={getHeight(250)}
+                reverse
             >
                 <ResizablePanel
                     direction={"horizontal"}

@@ -29,6 +29,10 @@ type GUIManagerEvents = {
     "event:editor.mainContent.requestFlush": [];
 };
 
+export enum TabIndex {
+    MainContent,
+}
+
 export class GUIManager {
     public static Events = {
         editor: {
@@ -89,17 +93,36 @@ export class GUIManager {
         return this.data.sidebar[side];
     }
 
-    public renderMainContent(side: MainContentPosition): React.ReactNode | null {
+    public renderMainContent(side: MainContentPosition): React.ReactElement[] {
         if (!this.data.main[side]) {
-            return null;
+            return [];
         }
+
+        const style = {
+            height: "100%",
+            width: "100%",
+        };
         if (SideBar.isSideBar(this.data.main[side])) {
-            return this.data.main[side].getCurrent()?.getComponent() || null;
+            const currentKey = this.data.main[side].getCurrentKey();
+            return this.data.main[side].entries().map(([key, item]) => {
+                return (
+                    React.createElement("div", {
+                        hidden: key !== currentKey,
+                        key,
+                        style,
+                    }, item.getComponent())
+                );
+            })
         }
         if (React.isValidElement(this.data.main[side])) {
-            return this.data.main[side];
+            return [
+                React.createElement("div", {
+                    key: "main",
+                    style,
+                }, this.data.main[side])
+            ];
         }
-        return null;
+        return [];
     }
 
     public setMainContent(side: MainContentPosition, content: MainContent): this {

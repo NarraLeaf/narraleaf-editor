@@ -1,34 +1,59 @@
 import {useEditor} from "@lib/providers/Editor";
-import {HorizontalBox, VerticalBox} from "@lib/utils/components";
+import {HorizontalBox, useFlush, VerticalBox} from "@lib/utils/components";
 import {CharacterBrowserFolder} from "@lib/components/Editor/CharacterBrowser/CharacterBrowserFolder";
 import {FolderPlusIcon} from "@heroicons/react/24/outline";
+import {useEffect} from "react";
 
 export function CharacterBrowser() {
     const editor = useEditor();
+    const flush = useFlush();
 
-    const characterGroups = editor.getProject().getCharacterManager().entries();
+    useEffect(() => {
+        return editor.GUIManger.onRequestMainContentFlush(flush).off;
+    }, [...editor.GUIManger.deps]);
+
+    const characterManager = editor.getProject().getCharacterManager();
+    const characterGroups = characterManager.entries();
+
+    function handleAddGroup() {
+        characterManager.addGroup(characterManager.newName("New Group"));
+        flush();
+    }
 
     return (
         <>
-            <VerticalBox
-                className={"h-full w-full overflow-y-scroll"}
-            >
-                <HorizontalBox
-                    className={"w-full h-6 place-content-between items-center"}
+            <div className={"w-full h-full relative overflow-y-scroll"}>
+                <VerticalBox
+                    className={"h-full w-full absolute bg-gray-50"}
                 >
+                    <HorizontalBox
+                        className={"w-full h-6 place-content-between items-center"}
+                    >
                     <span className={"text-nowrap select-none p-2"}>
                         Characters
                     </span>
-                    <div
-                        className={"text-nowrap cursor-pointer hover:bg-gray-200 p-2"}
-                    >
-                        <FolderPlusIcon className={"h-4 w-4"}/>
-                    </div>
-                </HorizontalBox>
-                {characterGroups.map(([name, group], index) => (
-                    <CharacterBrowserFolder name={name} group={group} key={index}/>
-                ))}
-            </VerticalBox>
+                        <div
+                            className={"text-nowrap cursor-pointer hover:bg-gray-200 p-2"}
+                            onClick={handleAddGroup}
+                        >
+                            <FolderPlusIcon className={"h-4 w-4"}/>
+                        </div>
+                    </HorizontalBox>
+                    {characterGroups.map(([name, group], index) => (
+                        <CharacterBrowserFolder
+                            id={index}
+                            name={name}
+                            group={group}
+                            key={name}
+                            onGroupRename={(newName) => {
+                                characterManager.renameGroup(name, newName);
+                                flush();
+                            }}
+                            isDefaultGroup={characterManager.isDefaultGroup(group)}
+                        />
+                    ))}
+                </VerticalBox>
+            </div>
         </>
     );
 }
