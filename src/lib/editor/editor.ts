@@ -49,6 +49,7 @@ export class Editor {
             Resize: "event:editor.resize",
         },
     }
+
     public static getCtx(editor: Editor): IGUIEventContext {
         return {
             editor,

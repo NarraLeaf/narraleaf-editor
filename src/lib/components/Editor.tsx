@@ -11,6 +11,7 @@ import {ToolBar as EditorToolBar} from "@lib/components/Editor/ToolBar/ToolBar";
 import {WindowEventAnnouncer} from "@lib/components/WindowEventAnnouncer";
 import {HorizontalBox, useFlush, VerticalBox} from "@lib/utils/components";
 import {SideBarItemsRegistry} from "@lib/components/Editor/SideBar/SideBarItemsRegistry";
+import {DndProvider} from "@lib/components/Editor/DNDControl/DNDControl";
 
 function MainContent(
     {
@@ -128,32 +129,34 @@ export function Editor() {
         <>
             <WindowEventAnnouncer/>
             <KeyEventAnnouncer/>
-            <VerticalBox className={"h-full w-full overflow-hidden"} ref={containerRef}>
+            <DndProvider>
+                <VerticalBox className={"h-full w-full overflow-hidden"} ref={containerRef}>
 
-                {/*  top: toolbar  */}
-                <VerticalBox className={"border-gray-200 border-[1px]"}>
-                    <EditorToolBar/>
-                </VerticalBox>
-
-                {/* left: left/bottom sidebars; right: main Content */}
-                <HorizontalBox className={"h-full max-w-full"}>
-
-                    {/* sidebars */}
-                    <VerticalBox className={"w-16 h-full place-content-between border-gray-200 border-[1px]"}>
-                        <SideBar sideBar={editor.GUIManger.getSideBar(SideBarPosition.Left)}/>
-                        <SideBar sideBar={editor.GUIManger.getSideBar(SideBarPosition.Bottom)}
-                                 className={"justify-end"}/>
+                    {/*  top: toolbar  */}
+                    <VerticalBox className={"border-gray-200 border-[1px]"}>
+                        <EditorToolBar/>
                     </VerticalBox>
 
-                    {/* main Content */}
-                    <MainContent containerRef={containerRef}/>
+                    {/* left: left/bottom sidebars; right: main Content */}
+                    <HorizontalBox className={"h-full max-w-full"}>
 
-                    {/* right sidebar */}
-                    <SideBar className={"h-full w-16 max-w-16 border-gray-200 border-[1px]"}
-                             sideBar={editor.GUIManger.getSideBar(SideBarPosition.Right)}/>
-                </HorizontalBox>
+                        {/* sidebars */}
+                        <VerticalBox className={"w-16 h-full place-content-between border-gray-200 border-[1px]"}>
+                            <SideBar sideBar={editor.GUIManger.getSideBar(SideBarPosition.Left)}/>
+                            <SideBar sideBar={editor.GUIManger.getSideBar(SideBarPosition.Bottom)}
+                                     className={"justify-end"}/>
+                        </VerticalBox>
 
-            </VerticalBox>
+                        {/* main Content */}
+                        <MainContent containerRef={containerRef}/>
+
+                        {/* right sidebar */}
+                        <SideBar className={"h-full w-16 max-w-16 border-gray-200 border-[1px]"}
+                                 sideBar={editor.GUIManger.getSideBar(SideBarPosition.Right)}/>
+                    </HorizontalBox>
+
+                </VerticalBox>
+            </DndProvider>
         </>
     );
 }

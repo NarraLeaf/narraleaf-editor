@@ -8,6 +8,7 @@ import {useFlush} from "@lib/utils/components";
 import {ContextMenu} from "../ContextMenu/ContextMenu";
 import {Editor} from "@lib/editor/editor";
 import {TabIndex} from "@lib/editor/GUIManager";
+import {DndNamespace, useDndElement} from "../DNDControl/DNDControl";
 
 export default function CharacterBrowserItem(
     {
@@ -15,17 +16,21 @@ export default function CharacterBrowserItem(
         onInspectCharacter,
         onRemoveCharacter,
         id,
+        isFolderDropping,
     }: Readonly<{
         character: Character;
         onInspectCharacter: (character: Character) => void;
         onRemoveCharacter: (character: Character) => void;
         id: string;
+        isFolderDropping?: boolean;
     }>
 ) {
     const editor = useEditor();
+    const flush = useFlush();
     const [isRenaming, setIsRenaming] = React.useState(false);
     const [currentName, setCurrentName] = React.useState(character.config.name);
-    const flush = useFlush();
+    const [dndElement, isDropping] = useDndElement(DndNamespace.characterBrowser.character, {character});
+
     const sideBar = editor.GUIManger.getSideBar(SideBarPosition.Bottom);
     const component =
         sideBar
@@ -70,13 +75,17 @@ export default function CharacterBrowserItem(
                     disabled: !canDelete,
                 }
             ]}
+            disabled={isDropping}
         >
-            <div
+            {dndElement(<div
                 className={clsx("flex justify-between items-center cursor-pointer hover:bg-gray-100 py-0.5 pl-1 border focus:border-primary-400 border-transparent", {
-                    "bg-gray-200 hover:bg-gray-300": selected,
+                    "bg-gray-200 hover:bg-gray-300": selected && !isFolderDropping,
+                    "bg-primary-200": selected && isFolderDropping,
+                    "bg-primary-100": isFolderDropping
                 })}
                 onClick={() => onInspectCharacter(character)}
                 tabIndex={TabIndex.MainContent}
+                onContextMenu={e => e.preventDefault()}
             >
                 {isRenaming ? (
                     <input
@@ -103,7 +112,7 @@ export default function CharacterBrowserItem(
                         {character.config.name}
                     </span>
                 )}
-            </div>
+            </div>)}
         </ContextMenu>
     );
 }

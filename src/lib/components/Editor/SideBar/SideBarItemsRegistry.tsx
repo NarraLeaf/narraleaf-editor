@@ -1,7 +1,7 @@
 import {SideBarItem, SideBarPosition} from "@lib/editor/SideBar";
 import HelloPage from "@lib/components/Pages/Hello";
 import React from "react";
-import {Bars3BottomLeftIcon, MusicalNoteIcon, PencilIcon, UserIcon} from "@heroicons/react/24/outline";
+import {Bars3BottomLeftIcon, MusicalNoteIcon, PencilIcon, UserIcon, PhotoIcon} from "@heroicons/react/24/outline";
 import PropertiesEmpty from "@lib/components/Pages/properties-empty";
 import {CharacterBrowser} from "@lib/components/Editor/CharacterBrowser/CharacterBrowser";
 import EmptySceneSelected from "@lib/components/Pages/EmptySceneSelected";
@@ -12,6 +12,7 @@ export const SideBarItemsKeys = {
     sounds: "sounds",
     properties: "properties",
     scripts: "scripts",
+    images: "images",
 }
 
 export const SideBarItemsRegistry: {
@@ -39,6 +40,13 @@ export const SideBarItemsRegistry: {
             component: <HelloPage/>,
             icon: (
                 <MusicalNoteIcon width={24}/>
+            ),
+        }),
+        [SideBarItemsKeys.images]: new SideBarItem({
+            name: "Images",
+            component: <HelloPage/>,
+            icon: (
+                <PhotoIcon width={24}/>
             ),
         }),
     },

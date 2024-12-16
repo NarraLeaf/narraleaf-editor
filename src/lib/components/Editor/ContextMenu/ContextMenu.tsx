@@ -9,10 +9,11 @@ import {Editor} from "@lib/editor/editor";
 import {IGUIEventContext} from "@lib/editor/type";
 import {useEditor} from "@lib/providers/Editor";
 import clsx from "clsx";
+import {EditorClickEvent} from "@lib/components/type";
 
 type EditorContextMenuItem = {
     label: string;
-    handler: (ctx: IGUIEventContext) => void;
+    handler: (event: EditorClickEvent, ctx: IGUIEventContext) => void;
     disabled?: boolean;
 };
 type EditorContextMenuProps = {
@@ -53,7 +54,7 @@ const EditorContextMenu = function (
                 {items.map((item, index) => (
                     <React.Fragment key={index}>
                         <MenuItem
-                            onClick={() => item.handler(Editor.getCtx(editor))}
+                            onClick={(event) => item.handler(event, Editor.getCtx(editor))}
                             className={clsx("cursor-pointer bg-white hover:bg-gray-100 p-1 select-none", {
                                 "text-gray-400": item.disabled,
                             })}

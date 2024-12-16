@@ -1,20 +1,21 @@
 import React from "react";
 import clsx from "clsx";
 
-export function HorizontalBox(
+export const HorizontalBox = React.forwardRef((
     {
         children,
         className,
     }: Readonly<{
     children?: React.ReactNode;
     className?: string;
-}>) {
+}>, ref: React.Ref<HTMLDivElement>) => {
     return (
-        <div className={clsx("flex flex-row", className)}>
+        <div className={clsx("flex flex-row", className)} ref={ref}>
             {children}
         </div>
     )
-}
+});
+HorizontalBox.displayName = "HorizontalBox";
 
 export const VerticalBox = React.forwardRef((
     {

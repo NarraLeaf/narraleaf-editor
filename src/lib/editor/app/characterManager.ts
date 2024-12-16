@@ -16,6 +16,10 @@ export class CharacterGroup {
         this.characters = this.characters.filter((c) => c !== character);
         return this;
     }
+
+    public hasCharacter(character: Character): boolean {
+        return this.characters.includes(character);
+    }
 }
 
 export class CharacterManager {
@@ -80,5 +84,23 @@ export class CharacterManager {
     public removeGroup(name: string): this {
         delete this.groups[name];
         return this;
+    }
+
+    public findGroupByCharacter(character: Character): CharacterGroup | null {
+        for (const group of this.values()) {
+            if (group.hasCharacter(character)) {
+                return group;
+            }
+        }
+        return null;
+    }
+
+    public moveCharacter(character: Character, group: CharacterGroup): this {
+        const oldGroup = this.findGroupByCharacter(character);
+        if (oldGroup) {
+            oldGroup.removeCharacter(character);
+        }
+        group.addCharacter(character);
+        return this
     }
 }

@@ -3,11 +3,12 @@ import {ToolBarFolder as Folder, ToolBarItem} from "@lib/editor/ToolBar";
 import {useEditor} from "@lib/providers/Editor";
 import {Editor} from "@lib/editor/editor";
 
-export default function ToolBarFolder({
-                                          folder,
-                                      }: Readonly<{
-    folder: Folder;
-}>) {
+export default function ToolBarFolder(
+    {
+        folder,
+    }: Readonly<{
+        folder: Folder;
+    }>) {
     const [open, setOpen] = React.useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
     const buttonRef = useRef<HTMLDivElement>(null);
@@ -96,7 +97,7 @@ export default function ToolBarFolder({
                         {folder.getItems().map((item, i) => (
                             <li
                                 key={i}
-                                className={"p-1 hover:bg-gray-200"}
+                                className={"p-1 hover:bg-primary-200 hover:text-white"}
                                 onClick={() => handleItemClick(item)}
                             >
                                 <div>

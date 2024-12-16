@@ -22,7 +22,7 @@ export function CharacterBrowser() {
 
     return (
         <>
-            <div className={"w-full h-full relative overflow-y-scroll"}>
+            <div className={"w-full h-full relative overflow-y-scroll overflow-x-hidden"}>
                 <VerticalBox
                     className={"h-full w-full absolute bg-gray-50"}
                 >
@@ -49,7 +49,6 @@ export function CharacterBrowser() {
                                 characterManager.renameGroup(name, newName);
                                 flush();
                             }}
-                            isDefaultGroup={characterManager.isDefaultGroup(group)}
                         />
                     ))}
                 </VerticalBox>
