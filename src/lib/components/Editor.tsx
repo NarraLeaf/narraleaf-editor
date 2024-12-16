@@ -21,7 +21,7 @@ function MainContent(
     }>,
 ) {
     const editor = useEditor();
-    const flush = useFlush();
+    const [flush] = useFlush();
     const [
         {containerWidth, containerHeight},
         setContainerSize
@@ -85,7 +85,7 @@ function MainContent(
 
 export function Editor() {
     const editor = useEditor();
-    const flush = useFlush();
+    const [flush] = useFlush();
     const containerRef = React.useRef<HTMLDivElement>(null);
 
     useEffect(() => {

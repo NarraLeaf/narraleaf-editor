@@ -20,6 +20,18 @@ export class CharacterGroup {
     public hasCharacter(character: Character): boolean {
         return this.characters.includes(character);
     }
+
+    public hasCharacterByName(name: string): boolean {
+        return this.characters.some((c) => c.config.name === name);
+    }
+
+    public newName(prefix: string): string {
+        let i = 1;
+        while (this.hasCharacterByName(`${prefix}-${i}`)) {
+            i++;
+        }
+        return `${prefix}-${i}`;
+    }
 }
 
 export class CharacterManager {

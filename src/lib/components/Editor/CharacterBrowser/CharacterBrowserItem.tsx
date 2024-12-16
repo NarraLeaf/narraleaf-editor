@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import React from "react";
+import React, {useEffect} from "react";
 import {SideBarPosition} from "@lib/editor/SideBar";
 import {Character} from "@lib/editor/app/elements/character";
 import CharacterPropertiesInspector from "@lib/components/Editor/CharacterBrowser/CharacterPropertiesInspector";
@@ -26,10 +26,12 @@ export default function CharacterBrowserItem(
     }>
 ) {
     const editor = useEditor();
-    const flush = useFlush();
+    const [flush, flushDep] = useFlush();
     const [isRenaming, setIsRenaming] = React.useState(false);
-    const [currentName, setCurrentName] = React.useState(character.config.name);
-    const [dndElement, isDropping] = useDndElement(DndNamespace.characterBrowser.character, {character});
+    const [currentName, setCurrentName] = React.useState<null | string>(null);
+    const [dndElement, isDropping] = useDndElement(DndNamespace.characterBrowser.character, {
+        character
+    }, [flushDep]);
 
     const sideBar = editor.GUIManger.getSideBar(SideBarPosition.Bottom);
     const component =
@@ -41,6 +43,10 @@ export default function CharacterBrowserItem(
     const canRename = !character.config.isNarrator;
     const canDelete = !character.config.isNarrator;
 
+    useEffect(() => {
+        return editor.GUIManger.onRequestMainContentFlush(flush).off;
+    }, [...editor.GUIManger.deps]);
+
     function handleStartRename() {
         if (canRename) {
             setIsRenaming(true);
@@ -51,13 +57,15 @@ export default function CharacterBrowserItem(
     function handleFinishRename() {
         setIsRenaming(false);
         if (
-            currentName !== character.config.name
+            currentName
+            && currentName !== character.config.name
             && currentName.trim().length > 0
         ) {
             character.config.name = currentName;
             flush();
             editor.GUIManger.requestMainContentFlush();
         }
+        setCurrentName(null);
     }
 
     return (
@@ -90,11 +98,14 @@ export default function CharacterBrowserItem(
                 {isRenaming ? (
                     <input
                         className={"w-full text-black bg-transparent border-b border-black"}
-                        value={currentName}
+                        value={currentName!}
                         onChange={(event) => setCurrentName(event.target.value)}
                         onKeyDown={(event) => {
                             if (event.key === Editor.Keys.Enter) {
                                 handleFinishRename();
+                            } else if (event.key === Editor.Keys.Escape) {
+                                setIsRenaming(false);
+                                setCurrentName(null);
                             }
                         }}
                         onBlur={handleFinishRename}

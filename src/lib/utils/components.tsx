@@ -34,6 +34,6 @@ export const VerticalBox = React.forwardRef((
 VerticalBox.displayName = "VerticalBox";
 
 export function useFlush() {
-    const [, forceUpdate] = React.useReducer(x => x + 1, 0);
-    return forceUpdate;
+    const [flushDep, forceUpdate] = React.useReducer(x => x + 1, 0);
+    return [forceUpdate, flushDep];
 }

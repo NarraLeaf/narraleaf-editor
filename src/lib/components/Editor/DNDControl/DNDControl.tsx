@@ -1,10 +1,11 @@
 import {RecursiveValue} from "@lib/components/type";
 import {Character} from "@lib/editor/app/elements/character";
-import React from "react";
+import React, {useEffect} from "react";
 import DNDGroup from "@lib/components/Editor/DNDControl/DNDGroup";
 import {DNDElement} from "@lib/components/Editor/DNDControl/DNDElement";
 import {DndProvider as ReactDndProvider} from "react-dnd";
 import {HTML5Backend} from "react-dnd-html5-backend";
+import {useFlush} from "@lib/utils/components";
 
 
 export const DndNamespace = {
@@ -36,11 +37,18 @@ type GroupChildrenRendererArgs = [
 export function useDndGroup<T extends RecursiveValue<typeof DndNamespace, string>>(
     type: T,
     onDrop: (item: DndControlContentType[T]) => void,
+    deps?: React.DependencyList,
 ): [
     ChildrenRenderer<GroupChildrenRendererArgs, typeof DNDGroup>,
     boolean,
 ] {
     const [isDropping, setIsDropping] = React.useState(false);
+    const [flush] = useFlush();
+
+    useEffect(() => {
+        flush();
+    }, deps ?? []);
+
     return [
         (children: ChildrenRendererInput<GroupChildrenRendererArgs>) => {
             const renderChildren =
@@ -71,11 +79,18 @@ type ElementChildrenRendererArgs = [
 export function useDndElement<T extends RecursiveValue<typeof DndNamespace, string>>(
     type: T,
     data: DndControlContentType[T],
+    deps?: React.DependencyList,
 ): [
     ChildrenRenderer<ElementChildrenRendererArgs, typeof DNDElement>,
     boolean,
 ] {
     const [isDragging, setIsDragging] = React.useState(false);
+    const [flush] = useFlush();
+
+    useEffect(() => {
+        flush();
+    }, deps ?? []);
+
     return [
         (children: ChildrenRendererInput<ElementChildrenRendererArgs>) => {
             const renderChildren =

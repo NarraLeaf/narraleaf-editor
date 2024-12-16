@@ -1,5 +1,5 @@
 import {CharacterGroup} from "@lib/editor/app/characterManager";
-import React from "react";
+import React, {useEffect} from "react";
 import {Character} from "@lib/editor/app/elements/character";
 import {useEditor} from "@lib/providers/Editor";
 import {SideBarPosition} from "@lib/editor/SideBar";
@@ -32,16 +32,20 @@ export function CharacterBrowserFolder(
 ) {
     const editor = useEditor();
     const groupManager = editor.getProject().getCharacterManager();
-    const flush = useFlush();
+    const [flush, flushDep] = useFlush();
     const [open, setOpen] = React.useState(false);
     const [isHeaderHovered, setIsHeaderHovered] = React.useState(false);
     const [isRenaming, setIsRenaming] = React.useState(false);
     const [currentName, setCurrentName] = React.useState(name);
     const [groupDND] = useDndGroup(DndNamespace.characterBrowser.character, ({character}) => {
         handleMoveCharacter(character);
-    });
+    }, [flushDep]);
 
     const isDefaultGroup = groupManager.isDefaultGroup(group);
+
+    useEffect(() => {
+        return editor.GUIManger.onRequestMainContentFlush(flush).off;
+    }, [...editor.GUIManger.deps]);
 
     function triggerOpen() {
         setOpen(!open);
@@ -49,7 +53,9 @@ export function CharacterBrowserFolder(
 
     function addCharacter(event: EditorClickEvent) {
         event.stopPropagation();
-        const newCharacter = Character.newCharacter("New Character");
+        const newCharacter = Character.newCharacter(
+            group.newName("New Character"),
+        );
         group.addCharacter(newCharacter);
         inspectCharacter(newCharacter);
         flush();

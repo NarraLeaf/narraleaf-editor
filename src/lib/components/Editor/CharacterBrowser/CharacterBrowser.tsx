@@ -6,7 +6,7 @@ import {useEffect} from "react";
 
 export function CharacterBrowser() {
     const editor = useEditor();
-    const flush = useFlush();
+    const [flush] = useFlush();
 
     useEffect(() => {
         return editor.GUIManger.onRequestMainContentFlush(flush).off;

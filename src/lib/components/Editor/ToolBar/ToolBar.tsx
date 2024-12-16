@@ -5,7 +5,7 @@ import {HorizontalBox, useFlush} from "@lib/utils/components";
 
 export function ToolBar() {
     const editor = useEditor();
-    const flush = useFlush();
+    const [flush] = useFlush();
 
     useEffect(() => {
         return editor.GUIManger.onRequestToolBarFlush(flush).off;

@@ -1,5 +1,6 @@
 import React, {useEffect, useRef} from "react";
 import {useDrop} from "react-dnd";
+import {useFlush} from "@lib/utils/components";
 
 export interface DNDGroupProps<T> {
     type: string;
@@ -7,6 +8,7 @@ export interface DNDGroupProps<T> {
     children: React.ReactNode;
     onStartDropping?: () => void;
     onStopDropping?: () => void;
+    deps?: React.DependencyList;
 }
 
 export default function DNDGroup<T = unknown>(
@@ -16,6 +18,7 @@ export default function DNDGroup<T = unknown>(
         children,
         onStartDropping,
         onStopDropping,
+        deps,
     }: DNDGroupProps<T>) {
     const ref = useRef<HTMLDivElement | null>(null);
     const [collected, drop] = useDrop({
@@ -27,6 +30,11 @@ export default function DNDGroup<T = unknown>(
             isOver: monitor.isOver() && monitor.canDrop() && monitor.isOver({shallow: true}),
         }),
     });
+    const [flush] = useFlush();
+
+    useEffect(() => {
+        flush();
+    }, deps ?? []);
 
     useEffect(() => {
         if (collected.isOver) {
