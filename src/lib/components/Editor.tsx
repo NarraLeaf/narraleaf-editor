@@ -141,7 +141,7 @@ export function Editor() {
                     <HorizontalBox className={"h-full max-w-full"}>
 
                         {/* sidebars */}
-                        <VerticalBox className={"w-16 h-full place-content-between border-gray-200 border-[1px]"}>
+                        <VerticalBox className={"w-16 h-full place-content-between border-gray-200 border-[1px] border-t-0"}>
                             <SideBar sideBar={editor.GUI.getSideBar(SideBarPosition.Left)}/>
                             <SideBar sideBar={editor.GUI.getSideBar(SideBarPosition.Bottom)}
                                      className={"justify-end"}/>
@@ -151,7 +151,7 @@ export function Editor() {
                         <MainContent containerRef={containerRef}/>
 
                         {/* right sidebar */}
-                        <SideBar className={"h-full w-16 max-w-16 border-gray-200 border-[1px]"}
+                        <SideBar className={"h-full w-16 max-w-16 border-gray-200 border-[1px] border-t-0"}
                                  sideBar={editor.GUI.getSideBar(SideBarPosition.Right)}/>
                     </HorizontalBox>
 

@@ -23,7 +23,7 @@ export default function HelloPage() {
                 height={400}
                 className={"opacity-20 select-none drag-none min-w-[400px]"}
             />
-            <VerticalBox className={"mt-4 select-none drag-none space-y-4"}>
+            <VerticalBox className={"mt-12 select-none drag-none space-y-4"}>
                 {links.map((link) => (
                     <a
                         key={link.href}

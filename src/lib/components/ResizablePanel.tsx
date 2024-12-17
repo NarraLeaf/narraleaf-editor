@@ -18,7 +18,7 @@ const ResizablePanel = (
         defaultSize?: number;
     }>) => {
     const containerRef = React.useRef<HTMLDivElement>(null);
-    const ref = React.useRef<HTMLDivElement>(null);
+    const mainElementRef = React.useRef<HTMLDivElement>(null);
     const [size, setSize] = React.useState(Math.max(minSize, defaultSize));
 
     const handleMouseDown = (e: React.MouseEvent) => {
@@ -35,11 +35,12 @@ const ResizablePanel = (
                 : startSize + (direction === 'horizontal' ? e.clientX - startPos : e.clientY - startPos);
             newSize = Math.max(minSize, newSize);
             if (direction === 'horizontal') {
-                newSize = Math.min(newSize, window.innerWidth - minSize);
+                newSize = Math.min(newSize, containerRef.current.clientWidth - minSize);
             } else {
-                newSize = Math.min(newSize, window.innerHeight - minSize);
+                newSize = Math.min(newSize, containerRef.current.clientHeight - minSize);
             }
             setSize(newSize);
+            console.log(newSize);
         };
 
         const onMouseUp = () => {
@@ -51,17 +52,18 @@ const ResizablePanel = (
         document.addEventListener('mouseup', onMouseUp);
     };
 
-    const style = {
-        width: direction === 'horizontal' ? `${Math.max(minSize, size)}px` : '100%',
-        height: direction === 'vertical' ? `${Math.max(minSize, size)}px` : '100%',
-    };
-
     const childrenArray = React.Children.toArray(children) as
         React.ReactElement<React.ClassAttributes<HTMLDivElement> & {
             hidden?: boolean;
         }>[];
     const displayChildren =
         childrenArray.filter(child => child.props.hidden !== true);
+    const isSingleChild = displayChildren.length === 1;
+
+    const style = {
+        width: direction === "horizontal" && !isSingleChild ? `${Math.max(minSize, size)}px` : '100%',
+        height: direction === "vertical" && !isSingleChild ? `${Math.max(minSize, size)}px` : '100%',
+    };
 
     return (
         <div
@@ -75,11 +77,11 @@ const ResizablePanel = (
                         return (
                             <React.Fragment key={index}>
                                 <div
-                                    className={"w-full h-full"}
+                                    className={"w-full h-full overflow-hidden"}
                                     style={(!reverse) ? style : {
                                         flex: 1,
                                     }}
-                                    ref={reverse ? ref : undefined}
+                                    ref={reverse ? mainElementRef : undefined}
                                 >
                                     {child}
                                 </div>
@@ -101,18 +103,38 @@ const ResizablePanel = (
                     return (
                         <React.Fragment key={index}>
                             <div
-                                onMouseDown={(e) => handleMouseDown(e)}
                                 style={{
+                                    position: 'relative',
                                     width: direction === 'horizontal' ? '2px' : '100%',
                                     height: direction === 'vertical' ? '2px' : '100%',
-                                    cursor: direction === 'horizontal' ? 'col-resize' : 'row-resize',
-                                    background: '#e7e7e7',
                                 }}
-                            ></div>
+                                className={"group"}
+                            >
+                                <div
+                                    onMouseDown={(e) => handleMouseDown(e)}
+                                    style={{
+                                        position: 'absolute',
+                                        top: 0,
+                                        left: 0,
+                                        width: direction === 'horizontal' ? '10px' : '100%',
+                                        height: direction === 'vertical' ? '10px' : '100%',
+                                        cursor: direction === 'horizontal' ? 'col-resize' : 'row-resize',
+                                    }}
+                                ></div>
+                                <div
+                                    style={{
+                                        width: direction === 'horizontal' ? '2px' : '100%',
+                                        height: direction === 'vertical' ? '2px' : '100%',
+                                    }}
+                                    className={"bg-gray-200 group-active:bg-primary group-hover:bg-primary transition-colors"}
+                                ></div>
+                            </div>
                             <div
                                 style={reverse ? style : {
-                                flex: 1
-                            }}
+                                    flex: 1
+                                }}
+                                ref={!reverse ? mainElementRef : undefined}
+                                className={"w-full h-full overflow-hidden"}
                             >
                                 {child}
                             </div>
