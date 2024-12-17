@@ -27,6 +27,7 @@ type GUIManagerEvents = {
     "event:editor.toolBar.requestFlush": [];
     "event:editor.sideBar.requestFlush": [];
     "event:editor.mainContent.requestFlush": [];
+    "event:editor.clipboard.requestFlush": [];
 };
 
 export enum TabIndex {
@@ -45,6 +46,9 @@ export class GUIManager {
             },
             mainContent: {
                 requestFlush: "event:editor.mainContent.requestFlush",
+            },
+            clipboard: {
+                requestFlush: "event:editor.clipboard.requestFlush",
             },
         }
     } as const;
@@ -215,6 +219,14 @@ export class GUIManager {
 
     public onRequestMainContentFlush(callback: () => void): EditorEventToken {
         return this.wrapEvent(GUIManager.Events.editor.mainContent.requestFlush, callback);
+    }
+
+    public requestClipboardFlush(): this {
+        return this.emitEvent(GUIManager.Events.editor.clipboard.requestFlush);
+    }
+
+    public onRequestClipboardFlush(callback: () => void): EditorEventToken {
+        return this.wrapEvent(GUIManager.Events.editor.clipboard.requestFlush, callback);
     }
 
     private wrapEvent(key: keyof GUIManagerEvents, callback: () => void): EditorEventToken {

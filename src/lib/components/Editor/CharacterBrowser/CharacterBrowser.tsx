@@ -9,8 +9,8 @@ export function CharacterBrowser() {
     const [flush] = useFlush();
 
     useEffect(() => {
-        return editor.GUIManger.onRequestMainContentFlush(flush).off;
-    }, [...editor.GUIManger.deps]);
+        return editor.GUI.onRequestMainContentFlush(flush).off;
+    }, [...editor.GUI.deps]);
 
     const characterManager = editor.getProject().getCharacterManager();
     const characterGroups = characterManager.entries();

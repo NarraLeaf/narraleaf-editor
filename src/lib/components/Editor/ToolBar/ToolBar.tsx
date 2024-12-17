@@ -8,10 +8,10 @@ export function ToolBar() {
     const [flush] = useFlush();
 
     useEffect(() => {
-        return editor.GUIManger.onRequestToolBarFlush(flush).off;
-    }, [...editor.GUIManger.deps]);
+        return editor.GUI.onRequestToolBarFlush(flush).off;
+    }, [...editor.GUI.deps]);
 
-    const {left, right} = editor.GUIManger.getToolBarGroupsByPosition();
+    const {left, right} = editor.GUI.getToolBarGroupsByPosition();
 
     return (
         <div className="w-full h-fit flex justify-between select-none">

@@ -9,18 +9,21 @@ import {ContextMenu} from "../ContextMenu/ContextMenu";
 import {Editor} from "@lib/editor/editor";
 import {TabIndex} from "@lib/editor/GUIManager";
 import {DndNamespace, useDndElement} from "../DNDControl/DNDControl";
+import {ClipboardNamespace} from "@lib/editor/ClipboardManager";
 
 export default function CharacterBrowserItem(
     {
         character,
         onInspectCharacter,
         onRemoveCharacter,
+        onPasteCharacter,
         id,
         isFolderDropping,
     }: Readonly<{
         character: Character;
         onInspectCharacter: (character: Character) => void;
         onRemoveCharacter: (character: Character) => void;
+        onPasteCharacter: (character: Character) => void;
         id: string;
         isFolderDropping?: boolean;
     }>
@@ -33,7 +36,7 @@ export default function CharacterBrowserItem(
         character
     }, [flushDep]);
 
-    const sideBar = editor.GUIManger.getSideBar(SideBarPosition.Bottom);
+    const sideBar = editor.GUI.getSideBar(SideBarPosition.Bottom);
     const component =
         sideBar
             ?.getCurrent()
@@ -44,8 +47,11 @@ export default function CharacterBrowserItem(
     const canDelete = !character.config.isNarrator;
 
     useEffect(() => {
-        return editor.GUIManger.onRequestMainContentFlush(flush).off;
-    }, [...editor.GUIManger.deps]);
+        return editor.dependEvents([
+            editor.GUI.onRequestMainContentFlush(flush),
+            editor.GUI.onRequestClipboardFlush(flush),
+        ]).off;
+    }, [...editor.GUI.deps]);
 
     function handleStartRename() {
         if (canRename) {
@@ -63,15 +69,36 @@ export default function CharacterBrowserItem(
         ) {
             character.config.name = currentName;
             flush();
-            editor.GUIManger.requestMainContentFlush();
+            editor.GUI.requestMainContentFlush();
         }
         setCurrentName(null);
+    }
+
+    function handleCopyCharacter() {
+        editor.getClipboard().copy(ClipboardNamespace.characterBrowser.character, character);
+    }
+
+    function handlePasteCharacter() {
+        const expected = [ClipboardNamespace.characterBrowser.character];
+        if (editor.getClipboard().is(expected)) {
+            const character = editor.getClipboard().paste(expected)!;
+            onPasteCharacter(character);
+        }
     }
 
     return (
         <ContextMenu
             id={id}
             items={[
+                {
+                    label: "copy",
+                    handler: handleCopyCharacter,
+                },
+                {
+                    label: "paste",
+                    handler: handlePasteCharacter,
+                    display: editor.getClipboard().is([ClipboardNamespace.characterBrowser.character]),
+                },
                 {
                     label: "rename",
                     handler: handleStartRename,

@@ -15,6 +15,7 @@ type EditorContextMenuItem = {
     label: string;
     handler: (event: EditorClickEvent, ctx: IGUIEventContext) => void;
     disabled?: boolean;
+    display?: boolean;
 };
 type EditorContextMenuProps = {
     children?: React.ReactNode;
@@ -51,19 +52,24 @@ const EditorContextMenu = function (
                 {children}
             </ContextMenuTrigger>
             <ContextMenu id={elementId} className={"min-w-[200px] bg-white shadow-md drop-shadow-md"}>
-                {items.map((item, index) => (
-                    <React.Fragment key={index}>
-                        <MenuItem
-                            onClick={(event) => item.handler(event, Editor.getCtx(editor))}
-                            className={clsx("cursor-pointer bg-white hover:bg-gray-100 p-1 select-none", {
-                                "text-gray-400": item.disabled,
-                            })}
-                            disabled={item.disabled}
-                        >
-                            {item.label}
-                        </MenuItem>
-                    </React.Fragment>
-                ))}
+                {items.map((item, index) => {
+                    if (item.display === false) {
+                        return null;
+                    }
+                    return (
+                        <React.Fragment key={index}>
+                            <MenuItem
+                                onClick={(event) => item.handler(event, Editor.getCtx(editor))}
+                                className={clsx("cursor-pointer bg-white hover:bg-gray-100 p-1 select-none", {
+                                    "text-gray-400": item.disabled,
+                                })}
+                                disabled={item.disabled}
+                            >
+                                {item.label}
+                            </MenuItem>
+                        </React.Fragment>
+                    );
+                })}
             </ContextMenu>
         </>
     );

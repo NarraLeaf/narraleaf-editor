@@ -15,6 +15,7 @@ import {ContextMenuNamespace, getContextMenuId} from "@lib/components/Editor/Con
 import {ContextMenu} from "@lib/components/Editor/ContextMenu/ContextMenu";
 import {EditorClickEvent} from "@lib/components/type";
 import {DndNamespace, useDndGroup} from "@lib/components/Editor/DNDControl/DNDControl";
+import {ClipboardNamespace} from "@lib/editor/ClipboardManager";
 
 export function CharacterBrowserFolder(
     {
@@ -44,8 +45,11 @@ export function CharacterBrowserFolder(
     const isDefaultGroup = groupManager.isDefaultGroup(group);
 
     useEffect(() => {
-        return editor.GUIManger.onRequestMainContentFlush(flush).off;
-    }, [...editor.GUIManger.deps]);
+        return editor.dependEvents([
+            editor.GUI.onRequestMainContentFlush(flush),
+            editor.GUI.onRequestClipboardFlush(flush),
+        ]).off;
+    }, [...editor.GUI.deps]);
 
     function triggerOpen() {
         setOpen(!open);
@@ -62,16 +66,16 @@ export function CharacterBrowserFolder(
     }
 
     function inspectCharacter(character: Character) {
-        editor.GUIManger
+        editor.GUI
             .getSideBar(SideBarPosition.Bottom)
             ?.get(SideBarItemsKeys.properties)
             ?.setComponent(
                 <CharacterPropertiesInspector character={character}/>
             );
-        editor.GUIManger
+        editor.GUI
             .getSideBar(SideBarPosition.Bottom)
             ?.setCurrent(SideBarItemsKeys.properties);
-        editor.GUIManger
+        editor.GUI
             .requestSideBarFlush()
             .requestMainContentFlush();
         flush();
@@ -79,7 +83,7 @@ export function CharacterBrowserFolder(
     }
 
     function removeCharacter(character: Character) {
-        const sideBar = editor.GUIManger.getSideBar(SideBarPosition.Bottom);
+        const sideBar = editor.GUI.getSideBar(SideBarPosition.Bottom);
         const currentComponent = sideBar?.getCurrent()?.getComponent();
         if (
             sideBar?.isCurrentComponent(CharacterPropertiesInspector)
@@ -92,7 +96,7 @@ export function CharacterBrowserFolder(
                 ?.hide();
         }
         group.removeCharacter(character);
-        editor.GUIManger
+        editor.GUI
             .requestSideBarFlush()
             .requestMainContentFlush();
         flush();
@@ -112,7 +116,7 @@ export function CharacterBrowserFolder(
             setCurrentName(newName);
             onGroupRename(newName);
             flush();
-            editor.GUIManger.requestMainContentFlush();
+            editor.GUI.requestMainContentFlush();
         }
     }
 
@@ -121,7 +125,18 @@ export function CharacterBrowserFolder(
             return;
         }
         groupManager.moveCharacter(character, group);
-        editor.GUIManger.requestMainContentFlush();
+        editor.GUI.requestMainContentFlush();
+    }
+
+    function pasteCharacter(character: Character) {
+        group.addCharacter(
+            character
+                .copy()
+                .setName(
+                    group.newName(character.getName() + " -copy")
+                )
+        );
+        flush();
     }
 
     return (
@@ -139,6 +154,17 @@ export function CharacterBrowserFolder(
                                 handler: addCharacter,
                             },
                             {
+                                label: "paste",
+                                handler: () => {
+                                    const expected = [ClipboardNamespace.characterBrowser.character];
+                                    if (editor.getClipboard().is(expected)) {
+                                        const character = editor.getClipboard().paste(expected)!;
+                                        pasteCharacter(character);
+                                    }
+                                },
+                                display: editor.getClipboard().is([ClipboardNamespace.characterBrowser.character]),
+                            },
+                            {
                                 label: "rename",
                                 handler: handleStartRename,
                                 disabled: isDefaultGroup,
@@ -147,7 +173,7 @@ export function CharacterBrowserFolder(
                                 label: "delete",
                                 handler: () => {
                                     editor.getProject().getCharacterManager().removeGroup(name);
-                                    editor.GUIManger.requestMainContentFlush();
+                                    editor.GUI.requestMainContentFlush();
                                 },
                                 disabled: isDefaultGroup,
                             }
@@ -219,6 +245,7 @@ export function CharacterBrowserFolder(
                                         key={index}
                                         onInspectCharacter={inspectCharacter}
                                         onRemoveCharacter={removeCharacter}
+                                        onPasteCharacter={pasteCharacter}
                                         isFolderDropping={isDropping}
                                     />
                                 );

@@ -18,8 +18,8 @@ export default function CharacterPropertiesInspector(
     const [currentName, setCurrentName] = React.useState<null | string>(null);
 
     useEffect(() => {
-        return editor.GUIManger.onRequestMainContentFlush(flush).off;
-    }, [...editor.GUIManger.deps]);
+        return editor.GUI.onRequestMainContentFlush(flush).off;
+    }, [...editor.GUI.deps]);
 
     useEffect(() => {
         return editor.onKeyPress(Editor.Keys.Escape, () => {
@@ -28,7 +28,7 @@ export default function CharacterPropertiesInspector(
                 setCurrentName(null);
             }
         }).off;
-    }, [isRenaming, ...editor.GUIManger.deps]);
+    }, [isRenaming, ...editor.GUI.deps]);
 
     function handleStartRename() {
         setIsRenaming(true);
@@ -44,7 +44,7 @@ export default function CharacterPropertiesInspector(
         ) {
             character.config.name = currentName;
             flush();
-            editor.GUIManger.requestMainContentFlush();
+            editor.GUI.requestMainContentFlush();
         }
         setCurrentName(null);
     }

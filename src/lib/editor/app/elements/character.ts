@@ -34,4 +34,21 @@ export class Character {
     public getGameCharacter(): GameCharacter {
         return this.gameCharacter;
     }
+
+    public copy(): Character {
+        return new Character({
+            name: this.config.name,
+            isNarrator: this.config.isNarrator,
+        });
+    }
+
+    public setName(name: string): this {
+        this.config.name = name;
+        this.gameCharacter.setName(name);
+        return this;
+    }
+
+    public getName(): string {
+        return this.config.name;
+    }
 }

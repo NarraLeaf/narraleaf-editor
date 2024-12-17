@@ -45,8 +45,8 @@ function MainContent(
     }, []);
 
     useEffect(() => {
-        return editor.GUIManger.onRequestMainContentFlush(flush).off;
-    }, [...editor.GUIManger.deps]);
+        return editor.GUI.onRequestMainContentFlush(flush).off;
+    }, [...editor.GUI.deps]);
 
     const getHeight = (expected: number) => {
         return Math.min(containerHeight - 250, expected);
@@ -72,12 +72,12 @@ function MainContent(
                         direction={"horizontal"}
                         minSize={getWidth(250)}
                     >
-                        {editor.GUIManger.renderMainContent(MainContentPosition.Left)}
-                        {editor.GUIManger.renderMainContent(MainContentPosition.Center)}
+                        {editor.GUI.renderMainContent(MainContentPosition.Left)}
+                        {editor.GUI.renderMainContent(MainContentPosition.Center)}
                     </ResizablePanel>
-                    {editor.GUIManger.renderMainContent(MainContentPosition.Right)}
+                    {editor.GUI.renderMainContent(MainContentPosition.Right)}
                 </ResizablePanel>
-                {editor.GUIManger.renderMainContent(MainContentPosition.Bottom)}
+                {editor.GUI.renderMainContent(MainContentPosition.Bottom)}
             </ResizablePanel>
         </>
     );
@@ -89,15 +89,15 @@ export function Editor() {
     const containerRef = React.useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        return editor.GUIManger.onRequestFlush(flush).off;
-    }, [...editor.GUIManger.deps]);
+        return editor.GUI.onRequestFlush(flush).off;
+    }, [...editor.GUI.deps]);
 
     useEffect(() => {
         Object.entries(ToolBarGroups).forEach(([key, group]) => {
-            editor.GUIManger.registerToolBarGroup(key, group);
+            editor.GUI.registerToolBarGroup(key, group);
         });
         Object.entries(SideBarItemsRegistry).forEach(([key, items]) => {
-            const sideBar = editor.GUIManger.getSideBar(key as SideBarPosition);
+            const sideBar = editor.GUI.getSideBar(key as SideBarPosition);
             if (!sideBar) {
                 console.warn(`Sidebar "${key}" is not registered`);
                 return;
@@ -108,7 +108,7 @@ export function Editor() {
             });
         });
 
-        editor.GUIManger.setMainContent(MainContentPosition.Center, (
+        editor.GUI.setMainContent(MainContentPosition.Center, (
             <HelloPage/>
         ))
 
@@ -116,14 +116,14 @@ export function Editor() {
 
         return () => {
             Object.keys(ToolBarGroups).forEach((key) => {
-                editor.GUIManger.unregisterToolBarGroup(key);
+                editor.GUI.unregisterToolBarGroup(key);
             });
         }
-    }, [...editor.GUIManger.deps]);
+    }, [...editor.GUI.deps]);
 
     useEffect(() => {
-        editor.GUIManger.requestFlush();
-    }, [...editor.GUIManger.deps]);
+        editor.GUI.requestFlush();
+    }, [...editor.GUI.deps]);
 
     return (
         <>
@@ -142,8 +142,8 @@ export function Editor() {
 
                         {/* sidebars */}
                         <VerticalBox className={"w-16 h-full place-content-between border-gray-200 border-[1px]"}>
-                            <SideBar sideBar={editor.GUIManger.getSideBar(SideBarPosition.Left)}/>
-                            <SideBar sideBar={editor.GUIManger.getSideBar(SideBarPosition.Bottom)}
+                            <SideBar sideBar={editor.GUI.getSideBar(SideBarPosition.Left)}/>
+                            <SideBar sideBar={editor.GUI.getSideBar(SideBarPosition.Bottom)}
                                      className={"justify-end"}/>
                         </VerticalBox>
 
@@ -152,7 +152,7 @@ export function Editor() {
 
                         {/* right sidebar */}
                         <SideBar className={"h-full w-16 max-w-16 border-gray-200 border-[1px]"}
-                                 sideBar={editor.GUIManger.getSideBar(SideBarPosition.Right)}/>
+                                 sideBar={editor.GUI.getSideBar(SideBarPosition.Right)}/>
                     </HorizontalBox>
 
                 </VerticalBox>

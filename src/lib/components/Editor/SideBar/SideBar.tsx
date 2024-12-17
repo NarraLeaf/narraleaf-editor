@@ -19,8 +19,8 @@ export default function SideBar(
     const [flush] = useFlush();
 
     React.useEffect(() => {
-        return editor.GUIManger.onRequestSideBarFlush(flush).off;
-    }, [...editor.GUIManger.deps]);
+        return editor.GUI.onRequestSideBarFlush(flush).off;
+    }, [...editor.GUI.deps]);
 
     if (!sideBar) {
         return null;

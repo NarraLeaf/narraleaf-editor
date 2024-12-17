@@ -3,6 +3,7 @@ import {EventEmitter} from "events";
 import {EditorEventToken, IGUIEventContext} from "@lib/editor/type";
 import React from "react";
 import {Project} from "@lib/editor/app/project";
+import {ClipboardManager} from "@lib/editor/ClipboardManager";
 
 
 export class Editor {
@@ -56,12 +57,14 @@ export class Editor {
         } satisfies IGUIEventContext;
     }
 
-    public GUIManger = new GUIManager();
+    public GUI = new GUIManager();
     public events: EventEmitter = new EventEmitter();
+    private readonly clipboard: ClipboardManager;
     private project: Project;
 
     constructor() {
         this.project = this.getNewProject("Untitled");
+        this.clipboard = new ClipboardManager(this);
     }
 
     public onKeyPress(key: React.KeyboardEvent["key"], callback: () => void): EditorEventToken {
@@ -100,5 +103,19 @@ export class Editor {
     public setProject(project: Project): this {
         this.project = project;
         return this;
+    }
+
+    public getClipboard(): ClipboardManager {
+        return this.clipboard;
+    }
+
+    public dependEvents(events: EditorEventToken[]): EditorEventToken {
+        return {
+            off: () => {
+                events.forEach((event) => {
+                    event.off();
+                });
+            }
+        };
     }
 }

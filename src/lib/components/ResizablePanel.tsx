@@ -18,6 +18,7 @@ const ResizablePanel = (
         defaultSize?: number;
     }>) => {
     const containerRef = React.useRef<HTMLDivElement>(null);
+    const ref = React.useRef<HTMLDivElement>(null);
     const [size, setSize] = React.useState(Math.max(minSize, defaultSize));
 
     const handleMouseDown = (e: React.MouseEvent) => {
@@ -78,6 +79,7 @@ const ResizablePanel = (
                                     style={(!reverse) ? style : {
                                         flex: 1,
                                     }}
+                                    ref={reverse ? ref : undefined}
                                 >
                                     {child}
                                 </div>
@@ -107,9 +109,11 @@ const ResizablePanel = (
                                     background: '#e7e7e7',
                                 }}
                             ></div>
-                            <div style={reverse ? style : {
+                            <div
+                                style={reverse ? style : {
                                 flex: 1
-                            }}>
+                            }}
+                            >
                                 {child}
                             </div>
                         </React.Fragment>
