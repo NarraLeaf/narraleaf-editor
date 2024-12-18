@@ -9,7 +9,7 @@ export function useFocus(parent?: Focusable | null): [
 ] {
     const editor = useEditor();
     const [isFocused, setFocused] = React.useState<{strict: boolean} | null>(null);
-    const [focusable] = React.useState(() => new Focusable().link(parent));
+    const [focusable] = React.useState(() => new Focusable());
 
     useEffect(() => {
         const handleFocusChange = () => {
@@ -24,6 +24,16 @@ export function useFocus(parent?: Focusable | null): [
             focusable.onFocused(handleFocusChange),
             focusable.onUnfocused(handleFocusChange),
         ]).off;
+    }, []);
+
+    useEffect(() => {
+        if (parent) {
+            focusable.link(parent);
+        }
+
+        return () => {
+            focusable.unlink();
+        };
     }, []);
 
     function handleFocus(e: React.MouseEvent<HTMLDivElement> | undefined) {

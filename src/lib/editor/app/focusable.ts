@@ -45,6 +45,12 @@ export class Focusable {
             this.parent.children.delete(this);
             this.parent = null;
         }
+        if (this.focused && !this.strictFocused) {
+            this.forEachParent((parent) => {
+                parent.focused = true;
+                parent.emitFocused();
+            });
+        }
         this.reset();
     }
 
@@ -76,6 +82,7 @@ export class Focusable {
 
     private reset() {
         this.focused = this.strictFocused = false;
+        this.emitUnfocused();
         return Array.from(this.children).map((child) => {
             child.reset();
         });

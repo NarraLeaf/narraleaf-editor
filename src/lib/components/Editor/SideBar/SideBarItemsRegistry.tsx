@@ -1,9 +1,7 @@
 import {SideBarItem, SideBarPosition} from "@lib/editor/SideBar";
 import React from "react";
 import {Bars3BottomLeftIcon, MusicalNoteIcon, PencilIcon, PhotoIcon, UserIcon} from "@heroicons/react/24/outline";
-import PropertiesEmpty from "@lib/components/Pages/properties-empty";
 import {CharacterBrowser} from "@lib/components/Editor/CharacterBrowser/CharacterBrowser";
-import EmptySceneSelected from "@lib/components/Pages/EmptySceneSelected";
 import {Null} from "@lib/components/Pages/Null";
 
 export const SideBarItemsKeys = {
@@ -53,7 +51,7 @@ export const SideBarItemsRegistry: {
     [SideBarPosition.Bottom]: {
         [SideBarItemsKeys.properties]: new SideBarItem({
             name: "Properties",
-            component: <PropertiesEmpty/>,
+            component: <Null text={"Select an element to inspect"}/>,
             icon: (
                 <Bars3BottomLeftIcon width={24}/>
             ),
@@ -62,7 +60,7 @@ export const SideBarItemsRegistry: {
     [SideBarPosition.Right]: {
         [SideBarItemsKeys.scripts]: new SideBarItem({
             name: "Scripts",
-            component: <EmptySceneSelected/>,
+            component: <Null text={"Select a scene to inspect"}/>,
             icon: (
                 <Bars3BottomLeftIcon width={24}/>
             ),

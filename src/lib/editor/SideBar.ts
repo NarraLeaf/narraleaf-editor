@@ -21,9 +21,11 @@ export enum SideBarPosition {
 
 export class SideBarItem {
     private data: SideBarConfig;
+    private defaultComponent: React.FunctionComponentElement<unknown> | null = null;
 
     constructor(data: SideBarConfig) {
         this.data = data;
+        this.defaultComponent = data.component;
     }
 
     public getName(): string {
@@ -45,6 +47,11 @@ export class SideBarItem {
 
     public clearComponent(): this {
         this.data.component = null;
+        return this;
+    }
+
+    public resetComponent(): this {
+        this.data.component = this.defaultComponent;
         return this;
     }
 }

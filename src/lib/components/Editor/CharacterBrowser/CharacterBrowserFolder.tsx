@@ -95,7 +95,7 @@ export function CharacterBrowserFolder(
         ) {
             sideBar
                 ?.get(SideBarItemsKeys.properties)
-                ?.clearComponent();
+                ?.resetComponent();
             sideBar
                 ?.hide();
         }
@@ -143,6 +143,30 @@ export function CharacterBrowserFolder(
         flush();
     }
 
+    function handleDeleteFolder() {
+        const sideBar = editor.GUI.getSideBar(SideBarPosition.Bottom);
+        const component =
+            sideBar
+                ?.getCurrent()
+                ?.getComponent<{ character: Character }>();
+        const selected =
+            component?.type === CharacterPropertiesInspector && group.hasCharacter(component.props.character);
+        if (selected) {
+            sideBar
+                ?.get(SideBarItemsKeys.properties)
+                ?.resetComponent();
+            sideBar
+                ?.hide();
+        }
+        editor
+            .getProject()
+            .getCharacterManager()
+            .removeGroup(name);
+        editor.GUI
+            .requestSideBarFlush()
+            .requestMainContentFlush();
+    }
+
     return (
         <>
             {/*  folder header  */}
@@ -175,10 +199,7 @@ export function CharacterBrowserFolder(
                             },
                             {
                                 label: "delete",
-                                handler: () => {
-                                    editor.getProject().getCharacterManager().removeGroup(name);
-                                    editor.GUI.requestMainContentFlush();
-                                },
+                                handler: handleDeleteFolder,
                                 disabled: isDefaultGroup,
                             }
                         ]}

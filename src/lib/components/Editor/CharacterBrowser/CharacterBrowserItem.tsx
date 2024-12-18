@@ -48,8 +48,8 @@ export default function CharacterBrowserItem(
             ?.getComponent<{ character: Character }>();
     const selected =
         component?.type === CharacterPropertiesInspector && component.props.character === character;
-    const canRename = !character.config.isNarrator;
-    const canDelete = !character.config.isNarrator;
+    const canRename = character.canRename();
+    const canDelete = character.canDelete();
 
     useEffect(() => {
         return editor.dependEvents([

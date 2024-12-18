@@ -10,12 +10,14 @@ export class Character {
     public static isCharacter(obj: any): obj is Character {
         return obj instanceof Character;
     }
+
     public static newCharacter(name?: string): Character {
         return new Character({
             name: name || "New Character",
             isNarrator: false,
         });
     }
+
     public static createNarrator(): Character {
         return new Character({
             name: "Narrator",
@@ -53,6 +55,10 @@ export class Character {
     }
 
     public canRename(): boolean {
+        return !this.config.isNarrator;
+    }
+
+    public canDelete(): boolean {
         return !this.config.isNarrator;
     }
 }
