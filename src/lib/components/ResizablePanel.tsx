@@ -21,6 +21,9 @@ const ResizablePanel = (
     const mainElementRef = React.useRef<HTMLDivElement>(null);
     const [size, setSize] = React.useState(Math.max(minSize, defaultSize));
 
+    const DraggerWidth = 1;
+    const DraggerBoxWidth = 10;
+
     const handleMouseDown = (e: React.MouseEvent) => {
         const startPos = direction === 'horizontal' ? e.clientX : e.clientY;
         const startSize = size;
@@ -40,7 +43,6 @@ const ResizablePanel = (
                 newSize = Math.min(newSize, containerRef.current.clientHeight - minSize);
             }
             setSize(newSize);
-            console.log(newSize);
         };
 
         const onMouseUp = () => {
@@ -105,8 +107,8 @@ const ResizablePanel = (
                             <div
                                 style={{
                                     position: 'relative',
-                                    width: direction === 'horizontal' ? '2px' : '100%',
-                                    height: direction === 'vertical' ? '2px' : '100%',
+                                    width: direction === 'horizontal' ? `${DraggerWidth}px` : '100%',
+                                    height: direction === 'vertical' ? `${DraggerWidth}px` : '100%',
                                 }}
                                 className={"group"}
                             >
@@ -116,15 +118,15 @@ const ResizablePanel = (
                                         position: 'absolute',
                                         top: 0,
                                         left: 0,
-                                        width: direction === 'horizontal' ? '10px' : '100%',
-                                        height: direction === 'vertical' ? '10px' : '100%',
+                                        width: direction === 'horizontal' ? `${DraggerBoxWidth}px` : '100%',
+                                        height: direction === 'vertical' ? `${DraggerBoxWidth}px` : '100%',
                                         cursor: direction === 'horizontal' ? 'col-resize' : 'row-resize',
                                     }}
                                 ></div>
                                 <div
                                     style={{
-                                        width: direction === 'horizontal' ? '2px' : '100%',
-                                        height: direction === 'vertical' ? '2px' : '100%',
+                                        width: direction === 'horizontal' ? `${DraggerWidth}px` : '100%',
+                                        height: direction === 'vertical' ? `${DraggerWidth}px` : '100%',
                                     }}
                                     className={"bg-gray-200 group-active:bg-primary group-hover:bg-primary transition-colors"}
                                 ></div>

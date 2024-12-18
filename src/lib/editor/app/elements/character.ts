@@ -51,4 +51,8 @@ export class Character {
     public getName(): string {
         return this.config.name;
     }
+
+    public canRename(): boolean {
+        return !this.config.isNarrator;
+    }
 }

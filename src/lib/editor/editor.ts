@@ -4,6 +4,7 @@ import {EditorEventToken, IGUIEventContext} from "@lib/editor/type";
 import React from "react";
 import {Project} from "@lib/editor/app/project";
 import {ClipboardManager} from "@lib/editor/ClipboardManager";
+import {Focusable} from "@lib/editor/app/focusable";
 
 
 export class Editor {
@@ -57,8 +58,14 @@ export class Editor {
         } satisfies IGUIEventContext;
     }
 
-    public GUI = new GUIManager();
+    public GUI: GUIManager = new GUIManager();
+    public focus: Focusable = new Focusable();
     public events: EventEmitter = new EventEmitter();
+    public readonly constants = {
+        ui: {
+            animationDuration: "duration-100"
+        }
+    } as const;
     private readonly clipboard: ClipboardManager;
     private project: Project;
 

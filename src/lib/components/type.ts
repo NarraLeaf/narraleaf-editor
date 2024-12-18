@@ -32,5 +32,6 @@ export type RecursiveValue<T, Included, Depth extends number = 10> =
                 RecursiveValue<T[K], Included, Decrement<Depth>>
             }[keyof T]
             : never;
+export type DivElementProps = React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>;
 
 

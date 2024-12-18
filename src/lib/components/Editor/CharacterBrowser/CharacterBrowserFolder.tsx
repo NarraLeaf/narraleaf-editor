@@ -1,14 +1,14 @@
-import {CharacterGroup} from "@lib/editor/app/characterManager";
 import React, {useEffect} from "react";
+import CharacterBrowserItem from "@lib/components/Editor/CharacterBrowser/CharacterBrowserItem";
+import CharacterPropertiesInspector from "@lib/components/Editor/CharacterBrowser/CharacterPropertiesInspector";
+import clsx from "clsx";
+import {CharacterGroup} from "@lib/editor/app/characterManager";
 import {Character} from "@lib/editor/app/elements/character";
 import {useEditor} from "@lib/providers/Editor";
 import {SideBarPosition} from "@lib/editor/SideBar";
 import {SideBarItemsKeys} from "@lib/components/Editor/SideBar/SideBarItemsRegistry";
-import CharacterPropertiesInspector from "@lib/components/Editor/CharacterBrowser/CharacterPropertiesInspector";
 import {ChevronDownIcon, ChevronRightIcon} from "@heroicons/react/24/outline";
-import clsx from "clsx";
 import {useFlush} from "@lib/utils/components";
-import CharacterBrowserItem from "@lib/components/Editor/CharacterBrowser/CharacterBrowserItem";
 import {Editor} from "@lib/editor/editor";
 import {TabIndex} from "@lib/editor/GUIManager";
 import {ContextMenuNamespace, getContextMenuId} from "@lib/components/Editor/ContextMenu/ContextMenuNamespace";
@@ -16,6 +16,8 @@ import {ContextMenu} from "@lib/components/Editor/ContextMenu/ContextMenu";
 import {EditorClickEvent} from "@lib/components/type";
 import {DndNamespace, useDndGroup} from "@lib/components/Editor/DNDControl/DNDControl";
 import {ClipboardNamespace} from "@lib/editor/ClipboardManager";
+import {useFocus} from "@lib/components/Focus";
+import {Focusable} from "@lib/editor/app/focusable";
 
 export function CharacterBrowserFolder(
     {
@@ -23,21 +25,23 @@ export function CharacterBrowserFolder(
         name,
         onGroupRename,
         id,
+        focusable,
     }: Readonly<{
         group: CharacterGroup;
         name: string;
         onGroupRename?: (name: string) => void;
         canRename?: boolean;
         id: string | number;
+        focusable: Focusable;
     }>
 ) {
     const editor = useEditor();
     const groupManager = editor.getProject().getCharacterManager();
     const [flush, flushDep] = useFlush();
     const [open, setOpen] = React.useState(false);
-    const [isHeaderHovered, setIsHeaderHovered] = React.useState(false);
     const [isRenaming, setIsRenaming] = React.useState(false);
     const [currentName, setCurrentName] = React.useState(name);
+    const [focused, focus, folderFocusable] = useFocus(focusable);
     const [groupDND] = useDndGroup(DndNamespace.characterBrowser.character, ({character}) => {
         handleMoveCharacter(character);
     }, [flushDep]);
@@ -183,10 +187,12 @@ export function CharacterBrowserFolder(
                             className={clsx("flex justify-between items-center px-2 py-1 cursor-pointer w-full select-none hover:bg-gray-100", {
                                 "bg-gray-100 hover:bg-gray-200": open,
                                 "bg-primary-100": isDropping,
-                            }, "border focus:border-primary-400 border-transparent")}
+                                "border-transparent": !focused,
+                                "border-primary": focused && focused.strict,
+                                "border-primary-100": focused && !focused.strict,
+                            }, "border-[1px] group transition-colors", editor.constants.ui.animationDuration)}
                             onClick={triggerOpen}
-                            onMouseEnter={() => setIsHeaderHovered(true)}
-                            onMouseLeave={() => setIsHeaderHovered(false)}
+                            onMouseDown={focus}
                             tabIndex={TabIndex.MainContent}
                         >
                             <div
@@ -223,8 +229,8 @@ export function CharacterBrowserFolder(
                                     )}
                             </div>
                             <div
-                                className={clsx("text-gray-300 cursor-pointer hover:text-gray-400", {
-                                    "hidden": !isHeaderHovered && !isRenaming,
+                                className={clsx("text-gray-300 cursor-pointer hover:text-gray-400 hidden group-hover:block", {
+                                    "hidden": isRenaming,
                                 })}
                                 onClick={(event) => {
                                     event.stopPropagation();
@@ -247,6 +253,7 @@ export function CharacterBrowserFolder(
                                         onRemoveCharacter={removeCharacter}
                                         onPasteCharacter={pasteCharacter}
                                         isFolderDropping={isDropping}
+                                        focusable={folderFocusable}
                                     />
                                 );
                             })}

@@ -3,10 +3,13 @@ import {HorizontalBox, useFlush, VerticalBox} from "@lib/utils/components";
 import {CharacterBrowserFolder} from "@lib/components/Editor/CharacterBrowser/CharacterBrowserFolder";
 import {FolderPlusIcon} from "@heroicons/react/24/outline";
 import {useEffect} from "react";
+import {useFocus} from "@lib/components/Focus";
+import clsx from "clsx";
 
 export function CharacterBrowser() {
     const editor = useEditor();
     const [flush] = useFlush();
+    const [focused, focus, focusable] = useFocus(editor.focus);
 
     useEffect(() => {
         return editor.GUI.onRequestMainContentFlush(flush).off;
@@ -22,7 +25,14 @@ export function CharacterBrowser() {
 
     return (
         <>
-            <div className={"w-full h-full relative overflow-y-scroll overflow-x-hidden"}>
+            <div
+                className={clsx("w-full h-full relative overflow-y-scroll overflow-x-hidden border-[1px]", {
+                    "border-transparent": !focused,
+                    "border-primary": focused && focused.strict,
+                    "border-primary-100": focused && !focused.strict,
+                }, "transition-colors", editor.constants.ui.animationDuration)}
+                onMouseDown={focus}
+            >
                 <VerticalBox
                     className={"h-full w-full absolute bg-gray-50"}
                 >
@@ -49,6 +59,7 @@ export function CharacterBrowser() {
                                 characterManager.renameGroup(name, newName);
                                 flush();
                             }}
+                            focusable={focusable}
                         />
                     ))}
                 </VerticalBox>

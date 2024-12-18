@@ -12,6 +12,7 @@ import {WindowEventAnnouncer} from "@lib/components/WindowEventAnnouncer";
 import {HorizontalBox, useFlush, VerticalBox} from "@lib/utils/components";
 import {SideBarItemsRegistry} from "@lib/components/Editor/SideBar/SideBarItemsRegistry";
 import {DndProvider} from "@lib/components/Editor/DNDControl/DNDControl";
+import {useFocus} from "@lib/components/Focus";
 
 function MainContent(
     {
@@ -86,6 +87,7 @@ function MainContent(
 export function Editor() {
     const editor = useEditor();
     const [flush] = useFlush();
+    const [, focus] = useFocus(editor.focus);
     const containerRef = React.useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -130,7 +132,11 @@ export function Editor() {
             <WindowEventAnnouncer/>
             <KeyEventAnnouncer/>
             <DndProvider>
-                <VerticalBox className={"h-full w-full overflow-hidden"} ref={containerRef}>
+                <VerticalBox
+                    className={"h-full w-full overflow-hidden"}
+                    ref={containerRef}
+                    onMouseDown={focus}
+                >
 
                     {/*  top: toolbar  */}
                     <VerticalBox className={"border-gray-200 border-[1px]"}>
@@ -141,7 +147,8 @@ export function Editor() {
                     <HorizontalBox className={"h-full max-w-full"}>
 
                         {/* sidebars */}
-                        <VerticalBox className={"w-16 h-full place-content-between border-gray-200 border-[1px] border-t-0"}>
+                        <VerticalBox
+                            className={"w-16 h-full place-content-between border-gray-200 border-[1px] border-t-0"}>
                             <SideBar sideBar={editor.GUI.getSideBar(SideBarPosition.Left)}/>
                             <SideBar sideBar={editor.GUI.getSideBar(SideBarPosition.Bottom)}
                                      className={"justify-end"}/>

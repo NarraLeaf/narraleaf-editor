@@ -13,6 +13,7 @@ export default function CharacterPropertiesInspector(
     }>
 ) {
     const editor = useEditor();
+    const canRename = character.canRename();
     const [flush] = useFlush();
     const [isRenaming, setIsRenaming] = React.useState(false);
     const [currentName, setCurrentName] = React.useState<null | string>(null);
@@ -74,10 +75,12 @@ export default function CharacterPropertiesInspector(
                             {character.config.name}
                         </span>
                     )}
-                    <PencilIcon
-                        className={"h-4 w-4 ml-1"}
-                        onClick={handleStartRename}
-                    />
+                    {canRename && (
+                        <PencilIcon
+                            className={"h-4 w-4 ml-1"}
+                            onClick={handleStartRename}
+                        />
+                    )}
                 </HorizontalBox>
             </VerticalBox>
         </>

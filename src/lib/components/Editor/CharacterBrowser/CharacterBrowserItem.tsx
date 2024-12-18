@@ -10,6 +10,8 @@ import {Editor} from "@lib/editor/editor";
 import {TabIndex} from "@lib/editor/GUIManager";
 import {DndNamespace, useDndElement} from "../DNDControl/DNDControl";
 import {ClipboardNamespace} from "@lib/editor/ClipboardManager";
+import {Focusable} from "@lib/editor/app/focusable";
+import {useFocus} from "@lib/components/Focus";
 
 export default function CharacterBrowserItem(
     {
@@ -19,6 +21,7 @@ export default function CharacterBrowserItem(
         onPasteCharacter,
         id,
         isFolderDropping,
+        focusable,
     }: Readonly<{
         character: Character;
         onInspectCharacter: (character: Character) => void;
@@ -26,12 +29,14 @@ export default function CharacterBrowserItem(
         onPasteCharacter: (character: Character) => void;
         id: string;
         isFolderDropping?: boolean;
+        focusable: Focusable;
     }>
 ) {
     const editor = useEditor();
     const [flush, flushDep] = useFlush();
     const [isRenaming, setIsRenaming] = React.useState(false);
     const [currentName, setCurrentName] = React.useState<null | string>(null);
+    const [focused, focus] = useFocus(focusable);
     const [dndElement, isDropping] = useDndElement(DndNamespace.characterBrowser.character, {
         character
     }, [flushDep]);
@@ -113,12 +118,16 @@ export default function CharacterBrowserItem(
             disabled={isDropping}
         >
             {dndElement(<div
-                className={clsx("flex justify-between items-center cursor-pointer hover:bg-gray-100 py-0.5 pl-1 border focus:border-primary-400 border-transparent", {
+                className={clsx("flex justify-between items-center cursor-pointer hover:bg-gray-100 py-0.5 pl-1 border", {
                     "bg-gray-200 hover:bg-gray-300": selected && !isFolderDropping,
                     "bg-primary-200": selected && isFolderDropping,
-                    "bg-primary-100": isFolderDropping
-                })}
+                    "bg-primary-100": isFolderDropping,
+                    "border-transparent": !focused,
+                    "border-primary": focused && focused.strict,
+                    "border-primary-100": focused && !focused.strict,
+                }, "transition-colors", editor.constants.ui.animationDuration)}
                 onClick={() => onInspectCharacter(character)}
+                onMouseDown={focus}
                 tabIndex={TabIndex.MainContent}
                 onContextMenu={e => e.preventDefault()}
             >

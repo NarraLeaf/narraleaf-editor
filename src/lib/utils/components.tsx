@@ -1,16 +1,18 @@
 import React from "react";
 import clsx from "clsx";
+import {DivElementProps} from "@lib/components/type";
 
 export const HorizontalBox = React.forwardRef((
     {
         children,
         className,
+        ...props
     }: Readonly<{
-    children?: React.ReactNode;
-    className?: string;
-}>, ref: React.Ref<HTMLDivElement>) => {
+        children?: React.ReactNode;
+        className?: string;
+    } & DivElementProps>, ref: React.Ref<HTMLDivElement>) => {
     return (
-        <div className={clsx("flex flex-row", className)} ref={ref}>
+        <div className={clsx("flex flex-row", className)} ref={ref} {...props}>
             {children}
         </div>
     )
@@ -21,12 +23,13 @@ export const VerticalBox = React.forwardRef((
     {
         children,
         className,
+        ...props
     }: Readonly<{
-    children?: React.ReactNode;
-    className?: string;
-}>, ref: React.Ref<HTMLDivElement>) => {
+        children?: React.ReactNode;
+        className?: string;
+    } & DivElementProps>, ref: React.Ref<HTMLDivElement>) => {
     return (
-        <div className={clsx("flex flex-col", className)} ref={ref}>
+        <div className={clsx("flex flex-col", className)} ref={ref} {...props}>
             {children}
         </div>
     )
