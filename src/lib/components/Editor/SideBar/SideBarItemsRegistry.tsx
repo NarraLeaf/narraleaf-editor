@@ -1,4 +1,4 @@
-import {SideBarItem, SideBarPosition} from "@lib/editor/SideBar";
+import {SideBarItem, SideBarPosition} from "@lib/editor/app/SideBar";
 import React from "react";
 import {Bars3BottomLeftIcon, MusicalNoteIcon, PencilIcon, PhotoIcon, UserIcon} from "@heroicons/react/24/outline";
 import {CharacterBrowser} from "@lib/components/Editor/CharacterBrowser/CharacterBrowser";

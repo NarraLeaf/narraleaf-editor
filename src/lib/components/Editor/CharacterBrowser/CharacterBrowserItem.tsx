@@ -1,15 +1,15 @@
 import clsx from "clsx";
 import React, {useEffect} from "react";
-import {SideBarPosition} from "@lib/editor/SideBar";
-import {Character} from "@lib/editor/app/elements/character";
+import {SideBarPosition} from "@lib/editor/app/SideBar";
+import {Character} from "@lib/editor/app/game/elements/character";
 import CharacterPropertiesInspector from "@lib/components/Editor/CharacterBrowser/CharacterPropertiesInspector";
 import {useEditor} from "@/lib/providers/Editor";
 import {useFlush} from "@lib/utils/components";
 import {ContextMenu} from "../ContextMenu/ContextMenu";
 import {Editor} from "@lib/editor/editor";
-import {TabIndex} from "@lib/editor/GUIManager";
+import {TabIndex} from "@lib/editor/app/GUIManager";
 import {DndNamespace, useDndElement} from "../DNDControl/DNDControl";
-import {ClipboardNamespace} from "@lib/editor/ClipboardManager";
+import {ClipboardNamespace} from "@lib/editor/app/ClipboardManager";
 import {Focusable} from "@lib/editor/app/focusable";
 import {useFocus} from "@lib/components/Focus";
 

@@ -1,4 +1,4 @@
-import {Character} from "@lib/editor/app/elements/character";
+import {Character} from "@lib/editor/app/game/elements/character";
 import React, {useEffect} from "react";
 import {useEditor} from "@lib/providers/Editor";
 import {HorizontalBox, useFlush, VerticalBox} from "@lib/utils/components";

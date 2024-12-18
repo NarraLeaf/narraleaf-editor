@@ -3,19 +3,19 @@ import CharacterBrowserItem from "@lib/components/Editor/CharacterBrowser/Charac
 import CharacterPropertiesInspector from "@lib/components/Editor/CharacterBrowser/CharacterPropertiesInspector";
 import clsx from "clsx";
 import {CharacterGroup} from "@lib/editor/app/characterManager";
-import {Character} from "@lib/editor/app/elements/character";
+import {Character} from "@lib/editor/app/game/elements/character";
 import {useEditor} from "@lib/providers/Editor";
-import {SideBarPosition} from "@lib/editor/SideBar";
+import {SideBarPosition} from "@lib/editor/app/SideBar";
 import {SideBarItemsKeys} from "@lib/components/Editor/SideBar/SideBarItemsRegistry";
 import {ChevronDownIcon, ChevronRightIcon} from "@heroicons/react/24/outline";
 import {useFlush} from "@lib/utils/components";
 import {Editor} from "@lib/editor/editor";
-import {TabIndex} from "@lib/editor/GUIManager";
+import {TabIndex} from "@lib/editor/app/GUIManager";
 import {ContextMenuNamespace, getContextMenuId} from "@lib/components/Editor/ContextMenu/ContextMenuNamespace";
 import {ContextMenu} from "@lib/components/Editor/ContextMenu/ContextMenu";
 import {EditorClickEvent} from "@lib/components/type";
 import {DndNamespace, useDndGroup} from "@lib/components/Editor/DNDControl/DNDControl";
-import {ClipboardNamespace} from "@lib/editor/ClipboardManager";
+import {ClipboardNamespace} from "@lib/editor/app/ClipboardManager";
 import {useFocus} from "@lib/components/Focus";
 import {Focusable} from "@lib/editor/app/focusable";
 

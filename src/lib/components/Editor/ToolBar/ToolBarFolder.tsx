@@ -1,5 +1,5 @@
 import React, {useEffect, useRef} from "react";
-import {ToolBarFolder as Folder, ToolBarItem} from "@lib/editor/ToolBar";
+import {ToolBarFolder as Folder, ToolBarItem} from "@lib/editor/app/ToolBar";
 import {useEditor} from "@lib/providers/Editor";
 import {Editor} from "@lib/editor/editor";
 

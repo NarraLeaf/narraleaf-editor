@@ -1,9 +1,9 @@
-import {GUIManager} from "./GUIManager";
+import {GUIManager} from "./app/GUIManager";
 import {EventEmitter} from "events";
 import {EditorEventToken, IGUIEventContext} from "@lib/editor/type";
 import React from "react";
 import {Project} from "@lib/editor/app/project";
-import {ClipboardManager} from "@lib/editor/ClipboardManager";
+import {ClipboardManager} from "@lib/editor/app/ClipboardManager";
 import {Focusable} from "@lib/editor/app/focusable";
 
 

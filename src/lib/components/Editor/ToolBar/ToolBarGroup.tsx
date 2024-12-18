@@ -1,5 +1,5 @@
 import React from "react";
-import {ToolBarGroup as Group} from "@lib/editor/ToolBar";
+import {ToolBarGroup as Group} from "@lib/editor/app/ToolBar";
 import ToolBarFolder from "./ToolBarFolder";
 import {HorizontalBox} from "@lib/utils/components";
 

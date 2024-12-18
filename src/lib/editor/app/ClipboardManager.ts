@@ -1,4 +1,4 @@
-import {Character} from "@lib/editor/app/elements/character";
+import {Character} from "@lib/editor/app/game/elements/character";
 import {RecursiveValue} from "@lib/components/type";
 import {Editor} from "@lib/editor/editor";
 

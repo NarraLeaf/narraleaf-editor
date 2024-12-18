@@ -1,4 +1,4 @@
-import {ToolBarFolder, ToolBarGroup, ToolBarItem, ToolBarPosition} from "@lib/editor/ToolBar";
+import {ToolBarFolder, ToolBarGroup, ToolBarItem, ToolBarPosition} from "@lib/editor/app/ToolBar";
 
 export const ToolBarGroups: {
     [K in string]: ToolBarGroup;

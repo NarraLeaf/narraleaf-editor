@@ -1,6 +1,6 @@
 import React from "react";
-import {ToolBarGroup, ToolBarPosition, ToolBarRegistry} from "@lib/editor/ToolBar";
-import {SideBar, SideBarPosition} from "@lib/editor/SideBar";
+import {ToolBarGroup, ToolBarPosition, ToolBarRegistry} from "@lib/editor/app/ToolBar";
+import {SideBar, SideBarPosition} from "@lib/editor/app/SideBar";
 import {EventEmitter} from "events";
 import {EditorEventToken} from "@lib/editor/type";
 

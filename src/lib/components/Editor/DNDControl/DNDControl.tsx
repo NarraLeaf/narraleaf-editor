@@ -1,5 +1,5 @@
 import {RecursiveValue} from "@lib/components/type";
-import {Character} from "@lib/editor/app/elements/character";
+import {Character} from "@lib/editor/app/game/elements/character";
 import React, {useEffect} from "react";
 import DNDGroup from "@lib/components/Editor/DNDControl/DNDGroup";
 import {DNDElement} from "@lib/components/Editor/DNDControl/DNDElement";

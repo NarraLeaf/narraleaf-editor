@@ -1,4 +1,4 @@
-import {SideBar, SideBarItem as EditorSideBarItem} from "@lib/editor/SideBar";
+import {SideBar, SideBarItem as EditorSideBarItem} from "@lib/editor/app/SideBar";
 import clsx from "clsx";
 import React from "react";
 import {VerticalBox} from "@lib/utils/components";

@@ -1,4 +1,4 @@
-import {Image} from "@lib/editor/app/elements/image";
+import {Image} from "@lib/editor/app/game/elements/image";
 
 export class ImageFolder {
     private images: Image[];
