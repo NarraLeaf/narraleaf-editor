@@ -1,12 +1,7 @@
 import React, {useEffect} from "react";
-import CharacterBrowserItem from "@lib/components/Editor/CharacterBrowser/CharacterBrowserItem";
-import CharacterPropertiesInspector from "@lib/components/Editor/CharacterBrowser/CharacterPropertiesInspector";
 import clsx from "clsx";
-import {CharacterGroup} from "@lib/editor/app/characterManager";
 import {Character} from "@lib/editor/app/game/elements/character";
 import {useEditor} from "@lib/providers/Editor";
-import {SideBarPosition} from "@lib/editor/app/SideBar";
-import {SideBarItemsKeys} from "@lib/components/Editor/SideBar/SideBarItemsRegistry";
 import {ChevronDownIcon, ChevronRightIcon} from "@heroicons/react/24/outline";
 import {useFlush} from "@lib/utils/components";
 import {Editor} from "@lib/editor/editor";
@@ -18,35 +13,34 @@ import {DndNamespace, useDndGroup} from "@lib/components/Editor/DNDControl/DNDCo
 import {ClipboardNamespace} from "@lib/editor/app/ClipboardManager";
 import {useFocus} from "@lib/components/Focus";
 import {Focusable} from "@lib/editor/app/focusable";
+import {Group} from "@lib/editor/app/tree";
+import {Image} from "@lib/editor/app/game/elements/image";
 
-export function CharacterBrowserFolder(
+type FileBrowserGroupConfig = {
+    id: string;
+    group: Group<any>,
+    focusable: Focusable,
+};
+
+export function FileBrowserFolder(
     {
-        group,
-        name,
-        onGroupRename,
         id,
         focusable,
-    }: Readonly<{
-        group: CharacterGroup;
-        name: string;
-        onGroupRename?: (name: string) => void;
-        canRename?: boolean;
-        id: string | number;
-        focusable: Focusable;
-    }>
+        group,
+    }: Readonly<FileBrowserGroupConfig>
 ) {
     const editor = useEditor();
-    const groupManager = editor.getProject().getCharacterManager();
     const [flush, flushDep] = useFlush();
     const [open, setOpen] = React.useState(false);
     const [isRenaming, setIsRenaming] = React.useState(false);
     const [currentName, setCurrentName] = React.useState<string | null>(null);
     const [focused, focus, folderFocusable] = useFocus(focusable);
-    const [groupDND] = useDndGroup(DndNamespace.characterBrowser.character, ({character}) => {
-        handleMoveCharacter(character);
+    const [groupDND] = useDndGroup(DndNamespace.imageBrowser.image, ({image}) => {
+        handleMoveImage(image);
     }, [flushDep]);
 
-    const isDefaultGroup = groupManager.isDefaultGroup(group);
+    const imageManager = editor.getProject().getImageManager();
+    const isRootGroup = imageManager.isRootGroup(group);
 
     useEffect(() => {
         return editor.dependEvents([
@@ -55,142 +49,51 @@ export function CharacterBrowserFolder(
         ]).off;
     }, [...editor.GUI.deps]);
 
-    useEffect(() => {
-        return editor.dependEvents([
-            editor.onKeysPress(Editor.Keys.V, Editor.ModifierKeys.Ctrl, onlyFocused(handlePasteCharacter)),
-            editor.onKeyPress(Editor.Keys.F2, onlyFocused(handleStartRename)),
-        ]).off;
-    }, [focused]);
-
     function triggerOpen() {
         setOpen(!open);
     }
 
     function addCharacter(event: EditorClickEvent) {
-        event.stopPropagation();
-        const newCharacter = Character.newCharacter(
-            group.newName("New Character"),
-        );
-        group.addCharacter(newCharacter);
-        inspectCharacter(newCharacter);
-        flush();
+        throw new Error("Not implemented");
     }
 
     function inspectCharacter(character: Character) {
-        editor.GUI
-            .getSideBar(SideBarPosition.Bottom)
-            ?.get(SideBarItemsKeys.properties)
-            ?.setComponent(
-                <CharacterPropertiesInspector character={character}/>
-            );
-        editor.GUI
-            .getSideBar(SideBarPosition.Bottom)
-            ?.setCurrent(SideBarItemsKeys.properties);
-        editor.GUI
-            .requestSideBarFlush()
-            .requestMainContentFlush();
-        flush();
-        setOpen(true);
+        throw new Error("Not implemented");
     }
 
     function removeCharacter(character: Character) {
-        const sideBar = editor.GUI.getSideBar(SideBarPosition.Bottom);
-        const currentComponent = sideBar?.getCurrent()?.getComponent();
-        if (
-            sideBar?.isCurrentComponent(CharacterPropertiesInspector)
-            && currentComponent?.props.character === character
-        ) {
-            sideBar
-                ?.get(SideBarItemsKeys.properties)
-                ?.resetComponent();
-            sideBar
-                ?.hide();
-        }
-        group.removeCharacter(character);
-        editor.GUI
-            .requestSideBarFlush()
-            .requestMainContentFlush();
-        flush();
+        throw new Error("Not implemented");
     }
 
     function handleStartRename() {
-        if (!isDefaultGroup) {
+        if (!isRootGroup) {
             setIsRenaming(true);
             setOpen(true);
-            setCurrentName(name);
         }
     }
 
     function handleFinishRename() {
         setIsRenaming(false);
-        if (currentName && currentName !== name && currentName.trim().length > 0 && onGroupRename) {
+        if (currentName && currentName !== group.getName() && currentName.trim().length > 0) {
             const newName = currentName.trim();
-            setCurrentName(newName);
-            onGroupRename(newName);
+            group.setName(newName);
+
             flush();
             editor.GUI.requestMainContentFlush();
         }
         setCurrentName(null);
     }
 
-    function handleMoveCharacter(character: Character) {
-        if (group.hasCharacter(character)) {
-            return;
-        }
-        groupManager.moveCharacter(character, group);
-        editor.GUI.requestMainContentFlush();
+    function handleMoveImage(image: Image) {
+        throw new Error("Not implemented");
     }
 
     function pasteCharacter(character: Character) {
-        group.addCharacter(
-            character
-                .copy()
-                .setName(
-                    group.newName(character.getName() + " -copy")
-                )
-        );
-        flush();
+        throw new Error("Not implemented");
     }
 
     function handleDeleteFolder() {
-        const sideBar = editor.GUI.getSideBar(SideBarPosition.Bottom);
-        const component =
-            sideBar
-                ?.getCurrent()
-                ?.getComponent<{ character: Character }>();
-        const selected =
-            component?.type === CharacterPropertiesInspector && group.hasCharacter(component.props.character);
-        if (selected) {
-            sideBar
-                ?.get(SideBarItemsKeys.properties)
-                ?.resetComponent();
-            sideBar
-                ?.hide();
-        }
-        editor
-            .getProject()
-            .getCharacterManager()
-            .removeGroup(name);
-        editor.GUI
-            .requestSideBarFlush()
-            .requestMainContentFlush();
-    }
-
-    function handlePasteCharacter() {
-        const expected = [ClipboardNamespace.characterBrowser.character];
-        if (editor.getClipboard().is(expected)) {
-            const character = editor.getClipboard().paste(expected)!;
-            pasteCharacter(character);
-            setOpen(true);
-        }
-    }
-
-    function onlyFocused(cb: (() => void)) {
-        return () => {
-            if (focused && focused.strict) {
-                cb();
-            }
-        };
+        throw new Error("Not implemented");
     }
 
     return (
@@ -201,7 +104,7 @@ export function CharacterBrowserFolder(
                     "bg-primary-100": isDropping,
                 })}>
                     <ContextMenu
-                        id={getContextMenuId(ContextMenuNamespace.characterBrowser.list.folder, id)}
+                        id={getContextMenuId(ContextMenuNamespace.imageBrowser.list.folder, id)}
                         items={[
                             {
                                 label: "new character",
@@ -209,18 +112,24 @@ export function CharacterBrowserFolder(
                             },
                             {
                                 label: "paste",
-                                handler: handlePasteCharacter,
+                                handler: () => {
+                                    const expected = [ClipboardNamespace.characterBrowser.character];
+                                    if (editor.getClipboard().is(expected)) {
+                                        const character = editor.getClipboard().paste(expected)!;
+                                        pasteCharacter(character);
+                                    }
+                                },
                                 display: editor.getClipboard().is([ClipboardNamespace.characterBrowser.character]),
                             },
                             {
                                 label: "rename",
                                 handler: handleStartRename,
-                                disabled: isDefaultGroup,
+                                disabled: isRootGroup,
                             },
                             {
                                 label: "delete",
                                 handler: handleDeleteFolder,
-                                disabled: isDefaultGroup,
+                                disabled: isRootGroup,
                             }
                         ]}
                     >
@@ -253,23 +162,19 @@ export function CharacterBrowserFolder(
                                             onKeyDown={(event) => {
                                                 if (event.key === Editor.Keys.Enter) {
                                                     handleFinishRename();
-                                                } else if (event.key === Editor.Keys.Escape) {
-                                                    setIsRenaming(false);
-                                                    setCurrentName(null);
                                                 }
                                             }}
                                             autoFocus
                                             onClick={(event) => {
                                                 event.stopPropagation();
                                             }}
-                                            className={"outline-none outline-primary-100 focus:bg-white focus:outline-1 w-full"}
                                         />
                                     )
                                     : (
                                         <span className={clsx({
-                                            "italic text-gray-500": isDefaultGroup,
+                                            "italic text-gray-500": isRootGroup,
                                         })}>
-                                    {name}
+                                    {currentName}
                                 </span>
                                     )}
                             </div>
@@ -288,20 +193,7 @@ export function CharacterBrowserFolder(
                     {/*  folder content  */}
                     {open && (
                         <div className="pl-2">
-                            {group.getCharacters().map((character, index) => {
-                                return (
-                                    <CharacterBrowserItem
-                                        character={character}
-                                        id={getContextMenuId(ContextMenuNamespace.characterBrowser.list.character, id, index)}
-                                        key={index}
-                                        onInspectCharacter={inspectCharacter}
-                                        onRemoveCharacter={removeCharacter}
-                                        onPasteCharacter={pasteCharacter}
-                                        isFolderDropping={isDropping}
-                                        focusable={folderFocusable}
-                                    />
-                                );
-                            })}
+
                         </div>
                     )}
                 </div>

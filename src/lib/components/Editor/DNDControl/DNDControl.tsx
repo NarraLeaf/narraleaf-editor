@@ -6,18 +6,25 @@ import {DNDElement} from "@lib/components/Editor/DNDControl/DNDElement";
 import {DndProvider as ReactDndProvider} from "react-dnd";
 import {HTML5Backend} from "react-dnd-html5-backend";
 import {useFlush} from "@lib/utils/components";
+import {Image} from "@lib/editor/app/game/elements/image";
 
 
 export const DndNamespace = {
     characterBrowser: {
         character: "dnd.editor:characterBrowser.character",
-    }
+    },
+    imageBrowser: {
+        image: "dnd.editor:imageBrowser.image",
+    },
 } as const;
 
 type DndControlContentType = {
     "dnd.editor:characterBrowser.character": {
         character: Character;
-    }
+    },
+    "dnd.editor:imageBrowser.image": {
+        image: Image;
+    },
 };
 
 type ChildrenRenderHandler<T extends unknown[], U extends string | React.JSXElementConstructor<any> = any> =

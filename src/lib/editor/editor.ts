@@ -6,6 +6,11 @@ import {Project} from "@lib/editor/app/project";
 import {ClipboardManager} from "@lib/editor/app/ClipboardManager";
 import {Focusable} from "@lib/editor/app/focusable";
 
+export enum ModifierKeys {
+    Ctrl = 0x1,
+    Shift = 0x2,
+    Alt = 0x4,
+}
 
 export class Editor {
     public static Keys = {
@@ -41,13 +46,20 @@ export class Editor {
         F10: "F10",
         F11: "F11",
         F12: "F12",
+        C: "c",
+        V: "v",
+        X: "x",
+        Z: "z",
+        Y: "y",
     };
     public static Constants = {
         ContextMenuPrefix: "__EditorContextMenu__",
     } as const;
+    public static ModifierKeys = ModifierKeys;
     public static Events = {
         Editor: {
             KeyPressed: "event:editor.keyPressed",
+            KeysPressed: "event:editor.keysPressed",
             Resize: "event:editor.resize",
         },
     }
@@ -60,7 +72,11 @@ export class Editor {
 
     public GUI: GUIManager = new GUIManager();
     public focus: Focusable = new Focusable();
-    public events: EventEmitter = new EventEmitter();
+    public events: EventEmitter = new EventEmitter<{
+        "event:editor.keyPressed": [string],
+        "event:editor.resize": [],
+        "event:editor.keysPressed": [string, ModifierKeys[]],
+    }>().setMaxListeners(Infinity);
     public readonly constants = {
         ui: {
             animationDuration: "duration-100"
@@ -75,14 +91,34 @@ export class Editor {
     }
 
     public onKeyPress(key: React.KeyboardEvent["key"], callback: () => void): EditorEventToken {
-        this.events.on(Editor.Events.Editor.KeyPressed, (k) => {
+        const listener = (k: string) => {
             if (k === key) {
                 callback();
             }
-        });
+        };
+        this.events.on(Editor.Events.Editor.KeyPressed, listener);
         return {
             off: () => {
-                this.events.off(Editor.Events.Editor.KeyPressed, callback);
+                this.events.off(Editor.Events.Editor.KeyPressed, listener);
+            }
+        };
+    }
+
+    public onKeysPress(key: React.KeyboardEvent["key"], ModifierKeys: number, callback: () => void): EditorEventToken {
+        const listener = (k: string, c: ModifierKeys[]) => {
+            if (k === key) {
+                const meetsControlKeys = c.every((ModifierKey) => {
+                    return ModifierKeys & ModifierKey;
+                });
+                if (meetsControlKeys) {
+                    callback();
+                }
+            }
+        };
+        this.events.on(Editor.Events.Editor.KeysPressed, listener);
+        return {
+            off: () => {
+                this.events.off(Editor.Events.Editor.KeysPressed, listener);
             }
         };
     }

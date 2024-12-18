@@ -7,7 +7,13 @@ export const ContextMenuNamespace = {
             character: "contextMenu.editor:characterBrowser.list.character",
             folder: "contextMenu.editor:characterBrowser.list.folder",
         }
-    }
+    },
+    imageBrowser: {
+        list: {
+            image: "contextMenu.editor:imageBrowser.list.image",
+            folder: "contextMenu.editor:imageBrowser.list.folder",
+        }
+    },
 } as const;
 
 export function getContextMenuId(namespace: RecursiveValue<typeof ContextMenuNamespace, string>, ...suffixes: (string | number)[]): string {

@@ -53,7 +53,7 @@ export class GUIManager {
         }
     } as const;
 
-    readonly events: EventEmitter<GUIManagerEvents> = new EventEmitter();
+    readonly events: EventEmitter<GUIManagerEvents> = new EventEmitter<GUIManagerEvents>().setMaxListeners(Infinity);
     private data: GUIData;
     private updateCounter: number = 0;
 

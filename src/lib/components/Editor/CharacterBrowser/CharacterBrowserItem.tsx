@@ -58,6 +58,14 @@ export default function CharacterBrowserItem(
         ]).off;
     }, [...editor.GUI.deps]);
 
+    useEffect(() => {
+        return editor.dependEvents([
+            editor.onKeysPress(Editor.Keys.C, Editor.ModifierKeys.Ctrl, onlyFocused(handleCopyCharacter)),
+            editor.onKeysPress(Editor.Keys.V, Editor.ModifierKeys.Ctrl, onlyFocused(handlePasteCharacter)),
+            editor.onKeyPress(Editor.Keys.F2, onlyFocused(handleStartRename)),
+        ]).off;
+    }, [focused]);
+
     function handleStartRename() {
         if (canRename) {
             setIsRenaming(true);
@@ -80,7 +88,7 @@ export default function CharacterBrowserItem(
     }
 
     function handleCopyCharacter() {
-        editor.getClipboard().copy(ClipboardNamespace.characterBrowser.character, character);
+        editor.getClipboard().copy(ClipboardNamespace.characterBrowser.character, character.copy());
     }
 
     function handlePasteCharacter() {
@@ -88,6 +96,14 @@ export default function CharacterBrowserItem(
         if (editor.getClipboard().is(expected)) {
             const character = editor.getClipboard().paste(expected)!;
             onPasteCharacter(character);
+        }
+    }
+
+    function onlyFocused(cb: (() => void)) {
+        return () => {
+            if (focused && focused.strict) {
+                cb();
+            }
         }
     }
 
@@ -133,7 +149,7 @@ export default function CharacterBrowserItem(
             >
                 {isRenaming ? (
                     <input
-                        className={"w-full text-black bg-transparent border-b border-black"}
+                        className={"w-full text-black bg-transparent border-b border-black outline-none outline-primary-100 focus:bg-white focus:outline-1"}
                         value={currentName!}
                         onChange={(event) => setCurrentName(event.target.value)}
                         onKeyDown={(event) => {
