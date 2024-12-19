@@ -41,7 +41,7 @@ export function DNDElement<T = unknown>(
     }, [ref, drag]);
 
     return (
-        <div ref={ref}>
+        <div ref={ref} className={"h-full w-full"}>
             {children}
         </div>
     );

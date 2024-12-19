@@ -8,10 +8,10 @@ export const ContextMenuNamespace = {
             folder: "contextMenu.editor:characterBrowser.list.folder",
         }
     },
-    imageBrowser: {
+    treeBrowser: {
         list: {
-            image: "contextMenu.editor:imageBrowser.list.image",
-            folder: "contextMenu.editor:imageBrowser.list.folder",
+            item: "contextMenu.editor:treeBrowser.list.item",
+            group: "contextMenu.editor:treeBrowser.list.group",
         }
     },
 } as const;

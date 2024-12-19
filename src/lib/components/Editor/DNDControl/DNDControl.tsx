@@ -7,6 +7,7 @@ import {DndProvider as ReactDndProvider} from "react-dnd";
 import {HTML5Backend} from "react-dnd-html5-backend";
 import {useFlush} from "@lib/utils/components";
 import {Image} from "@lib/editor/app/game/elements/image";
+import {Group, Item} from "@lib/editor/app/tree";
 
 
 export const DndNamespace = {
@@ -16,6 +17,9 @@ export const DndNamespace = {
     imageBrowser: {
         image: "dnd.editor:imageBrowser.image",
     },
+    fileBrowser: {
+        item: "dnd.editor:fileBrowser.item",
+    },
 } as const;
 
 type DndControlContentType = {
@@ -24,6 +28,10 @@ type DndControlContentType = {
     },
     "dnd.editor:imageBrowser.image": {
         image: Image;
+    },
+    "dnd.editor:fileBrowser.item": {
+        item: Item<any> | Group<Item<any>>;
+        lastParent?: Group<Item<any>>;
     },
 };
 
@@ -45,10 +53,8 @@ export function useDndGroup<T extends RecursiveValue<typeof DndNamespace, string
     type: T,
     onDrop: (item: DndControlContentType[T]) => void,
     deps?: React.DependencyList,
-): [
-    ChildrenRenderer<GroupChildrenRendererArgs, typeof DNDGroup>,
-    boolean,
-] {
+    id?: string
+): [ChildrenRenderer<GroupChildrenRendererArgs, typeof DNDGroup>, boolean] {
     const [isDropping, setIsDropping] = React.useState(false);
     const [flush] = useFlush();
 
@@ -64,7 +70,7 @@ export function useDndGroup<T extends RecursiveValue<typeof DndNamespace, string
                 }) : children;
             return (
                 <DNDGroup
-                    type={type}
+                    type={type + (id ? `{${id}}` : "")}
                     onDrop={onDrop}
                     onStartDropping={() => setIsDropping(true)}
                     onStopDropping={() => setIsDropping(false)}
@@ -87,10 +93,8 @@ export function useDndElement<T extends RecursiveValue<typeof DndNamespace, stri
     type: T,
     data: DndControlContentType[T],
     deps?: React.DependencyList,
-): [
-    ChildrenRenderer<ElementChildrenRendererArgs, typeof DNDElement>,
-    boolean,
-] {
+    id?: string
+): [ChildrenRenderer<ElementChildrenRendererArgs, typeof DNDElement>, boolean] {
     const [isDragging, setIsDragging] = React.useState(false);
     const [flush] = useFlush();
 
@@ -106,7 +110,7 @@ export function useDndElement<T extends RecursiveValue<typeof DndNamespace, stri
                 }) : children;
             return (
                 <DNDElement
-                    type={type}
+                    type={type + (id ? `{${id}}` : "")}
                     data={data}
                     onStartDragging={() => setIsDragging(true)}
                     onStopDragging={() => setIsDragging(false)}

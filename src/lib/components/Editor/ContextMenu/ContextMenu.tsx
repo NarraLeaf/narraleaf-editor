@@ -11,13 +11,13 @@ import {useEditor} from "@lib/providers/Editor";
 import clsx from "clsx";
 import {EditorClickEvent} from "@lib/components/type";
 
-type EditorContextMenuItem = {
+export type EditorContextMenuItem = {
     label: string;
     handler: (event: EditorClickEvent, ctx: IGUIEventContext) => void;
     disabled?: boolean;
     display?: boolean;
 };
-type EditorContextMenuProps = {
+export type EditorContextMenuProps = {
     children?: React.ReactNode;
     id: string;
     disabled?: boolean;

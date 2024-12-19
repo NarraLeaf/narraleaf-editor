@@ -33,5 +33,8 @@ export type RecursiveValue<T, Included, Depth extends number = 10> =
             }[keyof T]
             : never;
 export type DivElementProps = React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>;
+export type Values<T> = T[keyof T];
+export type ValuesOnly<T, U> = Values<{ [K in keyof T]: T[K] extends U ? K : never }>;
+export type ValuesOnlyNot<T, U> = Values<{ [K in keyof T]: T[K] extends U ? never : K }>;
 
 

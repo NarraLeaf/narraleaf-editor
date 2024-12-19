@@ -8,7 +8,7 @@ import {useEditor} from "@lib/providers/Editor";
 import {SideBarPosition} from "@lib/editor/app/SideBar";
 import {SideBarItemsKeys} from "@lib/components/Editor/SideBar/SideBarItemsRegistry";
 import {ChevronDownIcon, ChevronRightIcon} from "@heroicons/react/24/outline";
-import {useFlush} from "@lib/utils/components";
+import {useClipboard, useFlush} from "@lib/utils/components";
 import {Editor} from "@lib/editor/editor";
 import {TabIndex} from "@lib/editor/app/GUIManager";
 import {ContextMenuNamespace, getContextMenuId} from "@lib/components/Editor/ContextMenu/ContextMenuNamespace";
@@ -42,16 +42,16 @@ export function CharacterBrowserFolder(
     const [isRenaming, setIsRenaming] = React.useState(false);
     const [currentName, setCurrentName] = React.useState<string | null>(null);
     const [focused, focus, folderFocusable] = useFocus(focusable);
+    const [clipboard] = useClipboard();
     const [groupDND] = useDndGroup(DndNamespace.characterBrowser.character, ({character}) => {
         handleMoveCharacter(character);
-    }, [flushDep]);
+    }, [flushDep], "");
 
     const isDefaultGroup = groupManager.isDefaultGroup(group);
 
     useEffect(() => {
         return editor.dependEvents([
             editor.GUI.onRequestMainContentFlush(flush),
-            editor.GUI.onRequestClipboardFlush(flush),
         ]).off;
     }, [...editor.GUI.deps]);
 
@@ -178,8 +178,8 @@ export function CharacterBrowserFolder(
 
     function handlePasteCharacter() {
         const expected = [ClipboardNamespace.characterBrowser.character];
-        if (editor.getClipboard().is(expected)) {
-            const character = editor.getClipboard().paste(expected)!;
+        if (clipboard.is(expected)) {
+            const character = clipboard.paste(expected)!;
             pasteCharacter(character);
             setOpen(true);
         }
@@ -210,7 +210,7 @@ export function CharacterBrowserFolder(
                             {
                                 label: "paste",
                                 handler: handlePasteCharacter,
-                                display: editor.getClipboard().is([ClipboardNamespace.characterBrowser.character]),
+                                display: clipboard.is([ClipboardNamespace.characterBrowser.character]),
                             },
                             {
                                 label: "rename",

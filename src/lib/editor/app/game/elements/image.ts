@@ -1,4 +1,5 @@
 import {Image as GameImageConstructor} from "narraleaf-react";
+import {ValidTreeItem} from "@lib/editor/app/tree";
 
 // this will be fixed in the future
 export type GameImage = InstanceType<typeof GameImageConstructor>;
@@ -8,12 +9,13 @@ export type ImageConfig = {
     src: string;
 };
 
-export class Image {
+export class Image
+    implements ValidTreeItem<Image> {
     public static isImage(obj: any): obj is Image {
         return obj instanceof Image;
     }
 
-    private config: ImageConfig;
+    public config: ImageConfig;
     private readonly gameImage: GameImage;
 
     constructor(config: ImageConfig) {
@@ -26,5 +28,16 @@ export class Image {
 
     public getGameImage(): GameImage {
         return this.gameImage;
+    }
+
+    copy(): Image {
+        return new Image({
+            name: this.config.name,
+            src: this.config.src,
+        });
+    }
+
+    onSetName(name: string) {
+        this.config.name = name;
     }
 }

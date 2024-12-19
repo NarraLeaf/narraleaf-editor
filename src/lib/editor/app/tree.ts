@@ -1,4 +1,3 @@
-
 enum TreeItemType {
     Group,
     Item,
@@ -9,14 +8,19 @@ type ItemStat = {
 } & (
     | {
     type: TreeItemType.Item;
-    content: Item<unknown>;
+    content: Item<any>;
 }
     | {
     type: TreeItemType.Group;
-    content: Group<Item<unknown>>;
+    content: Group<Item<any>>;
 })
 
-export class Item<T> {
+export abstract class ValidTreeItem<T> {
+    abstract copy(): T;
+    abstract onSetName(name: string): void;
+}
+
+export class Item<T extends ValidTreeItem<any>> {
     public static isItem(obj: unknown): obj is Item<any> {
         return obj instanceof Item;
     }
@@ -24,6 +28,8 @@ export class Item<T> {
     private content: T;
     private group: Group<Item<T>> | null = null;
     private name: string;
+    private _canRename: boolean = true;
+    private _canDelete: boolean = true;
 
     constructor(name: string, content: T) {
         this.name = name;
@@ -32,6 +38,24 @@ export class Item<T> {
 
     public getContent(): T {
         return this.content;
+    }
+
+    public setCanRename(canRename: boolean): this {
+        this._canRename = canRename;
+        return this;
+    }
+
+    public setCanDelete(canDelete: boolean): this {
+        this._canDelete = canDelete;
+        return this;
+    }
+
+    public canRename(): boolean {
+        return this._canRename;
+    }
+
+    public canDelete(): boolean {
+        return this._canDelete;
     }
 
     public setContent(content: T): this {
@@ -54,6 +78,7 @@ export class Item<T> {
 
     public setName(name: string): this {
         this.name = name;
+        this.getContent().onSetName(name);
         return this;
     }
 
@@ -64,9 +89,22 @@ export class Item<T> {
             content: this,
         };
     }
+
+    public copy(): Item<T> {
+        return new Item(this.getName(), this.getContent().copy());
+    }
 }
 
+export type GroupConfig = {
+    canRename: boolean;
+    canDelete: boolean;
+};
+
 export class Group<T extends Item<any>> {
+    static DefaultConfig: GroupConfig = {
+        canRename: true,
+        canDelete: true,
+    }
     private static KeyPrefixes = {
         Group: "GROUP",
         Item: "ITEM",
@@ -84,12 +122,25 @@ export class Group<T extends Item<any>> {
         return obj instanceof Group;
     }
 
+    public config: GroupConfig;
     private items: (T | Group<T>)[] = [];
     private parent: Group<T> | null = null;
     private name: string;
+    private configFrozen: boolean = false;
 
-    constructor(name: string) {
+    constructor(name: string, config: Partial<GroupConfig> = {}) {
         this.name = name;
+        this.config = Object.assign({}, Group.DefaultConfig, config);
+    }
+
+    public isConfigFrozen(): boolean {
+        return this.configFrozen;
+    }
+
+    public freezeConfig(): this {
+        this.configFrozen = true;
+        this.config = Object.freeze(this.config);
+        return this;
     }
 
     public getItems(): (T | Group<T>)[] {
@@ -175,6 +226,42 @@ export class Group<T extends Item<any>> {
             type: TreeItemType.Group,
             content: this,
         };
+    }
+
+    public copy(): Group<T> {
+        const group = new Group<T>(this.getName(), {...this.config});
+        this.items.forEach((item) => {
+            if (Item.isItem(item)) {
+                group.addItem(item.copy() as T);
+            } else {
+                group.addGroup(item.copy());
+            }
+        });
+        return group;
+    }
+
+    public newName(prefix: string): string {
+        let i = 1;
+        let name = `${prefix}-${i}`;
+        const names = new Set(this.items.map((item) => item.getName()));
+        while (names.has(name)) {
+            i++;
+            name = `${prefix}-${i}`;
+        }
+        return name;
+    }
+
+    public toChildren(): (T | Group<T>)[] {
+        const groups: Group<T>[] = [];
+        const items: T[] = [];
+        this.items.forEach((item) => {
+            if (Item.isItem(item)) {
+                items.push(item);
+            } else {
+                groups.push(item);
+            }
+        });
+        return [...groups, ...items];
     }
 
     private setParent(parent: Group<T> | null): this {

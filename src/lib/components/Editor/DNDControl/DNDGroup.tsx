@@ -23,11 +23,13 @@ export default function DNDGroup<T = unknown>(
     const ref = useRef<HTMLDivElement | null>(null);
     const [collected, drop] = useDrop({
         accept: type,
-        drop: (item: T) => {
-            onDrop(item);
+        drop: (item: T, monitor) => {
+            if (monitor.isOver({ shallow: true })) {
+                onDrop(item);
+            }
         },
         collect: (monitor) => ({
-            isOver: monitor.isOver() && monitor.canDrop() && monitor.isOver({shallow: true}),
+            isOver: monitor.canDrop() && monitor.isOver({shallow: true}),
         }),
     });
     const [flush] = useFlush();
@@ -51,7 +53,7 @@ export default function DNDGroup<T = unknown>(
     }, [ref, drop]);
 
     return (
-        <div ref={ref}>
+        <div ref={ref} className={"h-full w-full"}>
             {children}
         </div>
     );

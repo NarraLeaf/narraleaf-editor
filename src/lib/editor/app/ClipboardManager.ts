@@ -1,15 +1,23 @@
 import {Character} from "@lib/editor/app/game/elements/character";
 import {RecursiveValue} from "@lib/components/type";
 import {Editor} from "@lib/editor/editor";
+import {Group, Item} from "@lib/editor/app/tree";
+import {Image} from "@lib/editor/app/game/elements/image";
 
 export const ClipboardNamespace = {
     characterBrowser: {
         character: "clipboard.editor:characterBrowser.character",
-    }
+    },
+    imageBrowser: {
+        imageGroup: "clipboard.editor:imageBrowser.imageGroup",
+        imageItem: "clipboard.editor:imageBrowser.imageItem",
+    },
 } as const;
 
-type ClipboardContentType = {
+export type ClipboardContentType = {
     "clipboard.editor:characterBrowser.character": Character;
+    "clipboard.editor:imageBrowser.imageGroup": Group<Item<Image>>;
+    "clipboard.editor:imageBrowser.imageItem": Item<Image>;
 };
 
 type ClipboardContent = {

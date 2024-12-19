@@ -1,20 +1,23 @@
 import React, {useEffect} from "react";
 import clsx from "clsx";
-import {Character} from "@lib/editor/app/game/elements/character";
 import {useEditor} from "@lib/providers/Editor";
-import {ChevronDownIcon, ChevronRightIcon} from "@heroicons/react/24/outline";
-import {useFlush} from "@lib/utils/components";
+import {ChevronDownIcon, ChevronRightIcon, FolderPlusIcon} from "@heroicons/react/24/outline";
+import {HorizontalBox, useClipboard, useFlush} from "@lib/utils/components";
 import {Editor} from "@lib/editor/editor";
 import {TabIndex} from "@lib/editor/app/GUIManager";
 import {ContextMenuNamespace, getContextMenuId} from "@lib/components/Editor/ContextMenu/ContextMenuNamespace";
-import {ContextMenu} from "@lib/components/Editor/ContextMenu/ContextMenu";
-import {EditorClickEvent} from "@lib/components/type";
-import {DndNamespace, useDndGroup} from "@lib/components/Editor/DNDControl/DNDControl";
-import {ClipboardNamespace} from "@lib/editor/app/ClipboardManager";
+import {ContextMenu, EditorContextMenuItem} from "@lib/components/Editor/ContextMenu/ContextMenu";
+import {DndNamespace, useDndElement, useDndGroup} from "@lib/components/Editor/DNDControl/DNDControl";
 import {useFocus} from "@lib/components/Focus";
 import {Focusable} from "@lib/editor/app/focusable";
-import {Group} from "@lib/editor/app/tree";
-import {Image} from "@lib/editor/app/game/elements/image";
+import {Group, Item} from "@lib/editor/app/tree";
+import {
+    FileBrowserConfig,
+    FileBrowserEventCtx,
+    FileBrowserEventType
+} from "@lib/components/Editor/FileBrowser/FileBrowser";
+import {IGUIEventContext} from "@lib/editor/type";
+import FileBrowserItem from "@lib/components/Editor/FileBrowser/FileBrowserItem";
 
 type FileBrowserGroupConfig = {
     id: string;
@@ -22,22 +25,36 @@ type FileBrowserGroupConfig = {
     focusable: Focusable,
 };
 
-export function FileBrowserFolder(
-    {
+export function FileBrowserFolder<T extends Item<any>>(
+    props: Readonly<FileBrowserGroupConfig & FileBrowserConfig<T>>
+) {
+    const {
         id,
         focusable,
         group,
-    }: Readonly<FileBrowserGroupConfig>
-) {
+        folderContextMenu = [],
+        groupClipboardId,
+        itemClipboardId,
+        handleCreateItem,
+        onDeleteItem,
+        onRenameItem
+    } = props;
+
     const editor = useEditor();
     const [flush, flushDep] = useFlush();
     const [open, setOpen] = React.useState(false);
     const [isRenaming, setIsRenaming] = React.useState(false);
     const [currentName, setCurrentName] = React.useState<string | null>(null);
     const [focused, focus, folderFocusable] = useFocus(focusable);
-    const [groupDND] = useDndGroup(DndNamespace.imageBrowser.image, ({image}) => {
-        handleMoveImage(image);
+    const [clipboard] = useClipboard();
+    const [groupDND] = useDndGroup(DndNamespace.fileBrowser.item, ({item, lastParent}) => {
+        handleMoveItem(item, lastParent);
     }, [flushDep]);
+    const [dndElement, isDragging] = useDndElement(DndNamespace.fileBrowser.item, {
+        item: group,
+        lastParent: group.getParent() || undefined,
+    }, [flushDep]);
+
 
     const imageManager = editor.getProject().getImageManager();
     const isRootGroup = imageManager.isRootGroup(group);
@@ -45,30 +62,46 @@ export function FileBrowserFolder(
     useEffect(() => {
         return editor.dependEvents([
             editor.GUI.onRequestMainContentFlush(flush),
-            editor.GUI.onRequestClipboardFlush(flush),
         ]).off;
     }, [...editor.GUI.deps]);
+
+    useEffect(() => {
+        return editor.dependEvents([
+            editor.onKeysPress(Editor.Keys.C, Editor.ModifierKeys.Ctrl, onlyFocused(handleCopy)),
+            editor.onKeysPress(Editor.Keys.V, Editor.ModifierKeys.Ctrl, onlyFocused(handlePaste)),
+            editor.onKeyPress(Editor.Keys.F2, onlyFocused(handleStartRename)),
+        ]).off;
+    }, [focused]);
 
     function triggerOpen() {
         setOpen(!open);
     }
 
-    function addCharacter(event: EditorClickEvent) {
-        throw new Error("Not implemented");
-    }
-
-    function inspectCharacter(character: Character) {
-        throw new Error("Not implemented");
-    }
-
-    function removeCharacter(character: Character) {
-        throw new Error("Not implemented");
+    function handleMoveItem(item: Group<Item<any>> | Item<any>, lastParent?: Group<Item<any>>) {
+        if (group === lastParent) {
+            return;
+        }
+        if (lastParent) {
+            if (Group.isGroup(item)) {
+                lastParent.removeGroup(item);
+            } else {
+                lastParent.removeItem(item);
+            }
+        }
+        if (Group.isGroup(item)) {
+            group.addGroup(item);
+        } else {
+            group.addItem(item);
+        }
+        setOpen(true);
+        editor.GUI.requestMainContentFlush();
     }
 
     function handleStartRename() {
         if (!isRootGroup) {
             setIsRenaming(true);
             setOpen(true);
+            setCurrentName(group.getName());
         }
     }
 
@@ -78,22 +111,67 @@ export function FileBrowserFolder(
             const newName = currentName.trim();
             group.setName(newName);
 
-            flush();
+            onRenameItem?.(getCtx(Editor.getCtx(editor)));
             editor.GUI.requestMainContentFlush();
         }
         setCurrentName(null);
     }
 
-    function handleMoveImage(image: Image) {
-        throw new Error("Not implemented");
+    function handlePaste() {
+        if (!clipboard.is([groupClipboardId, itemClipboardId])) {
+            return;
+        }
+        const content = clipboard.paste([groupClipboardId, itemClipboardId])!;
+        if (Group.isGroup(content)) {
+            group.addGroup(content.copy().setName(
+                group.newName(content.getName() + "(copy)")
+            ));
+        } else {
+            group.addItem(content.copy().setName(
+                group.newName(content.getName() + "(copy)")
+            ));
+        }
+        setOpen(true);
+        editor.GUI.requestMainContentFlush();
     }
 
-    function pasteCharacter(character: Character) {
-        throw new Error("Not implemented");
+    function handleCopy() {
+        clipboard.copy(groupClipboardId, group.copy());
     }
 
-    function handleDeleteFolder() {
-        throw new Error("Not implemented");
+    function handleCreate() {
+        handleCreateItem?.(getCtx(Editor.getCtx(editor)));
+        setOpen(true);
+        editor.GUI.requestMainContentFlush();
+    }
+
+    function handleDeleteGroup(ctx: IGUIEventContext) {
+        group.getParent()?.removeGroup(group);
+        onDeleteItem?.(getCtx(ctx));
+        editor.GUI.requestMainContentFlush();
+    }
+
+    function handleCreateGroup() {
+        const newGroup = new Group<T>(group.newName("New Folder"));
+        group.addGroup(newGroup);
+        setOpen(true);
+        editor.GUI.requestMainContentFlush();
+    }
+
+    function getCtx(ctx: IGUIEventContext): FileBrowserEventCtx<T, FileBrowserEventType.Group> {
+        return {
+            ...ctx,
+            type: FileBrowserEventType.Group,
+            group: group,
+        };
+    }
+
+    function onlyFocused(cb: (() => void)) {
+        return () => {
+            if (focused && focused.strict) {
+                cb();
+            }
+        }
     }
 
     return (
@@ -104,36 +182,36 @@ export function FileBrowserFolder(
                     "bg-primary-100": isDropping,
                 })}>
                     <ContextMenu
-                        id={getContextMenuId(ContextMenuNamespace.imageBrowser.list.folder, id)}
+                        id={getContextMenuId(ContextMenuNamespace.treeBrowser.list.group, id)}
                         items={[
+                            ...(folderContextMenu.map((item) => ({
+                                ...item,
+                                handler: (_, ctx) =>
+                                    item.handler(getCtx(ctx)),
+                            }) satisfies EditorContextMenuItem)),
                             {
-                                label: "new character",
-                                handler: addCharacter,
+                                label: "copy",
+                                handler: handleCopy,
                             },
                             {
                                 label: "paste",
-                                handler: () => {
-                                    const expected = [ClipboardNamespace.characterBrowser.character];
-                                    if (editor.getClipboard().is(expected)) {
-                                        const character = editor.getClipboard().paste(expected)!;
-                                        pasteCharacter(character);
-                                    }
-                                },
-                                display: editor.getClipboard().is([ClipboardNamespace.characterBrowser.character]),
+                                handler: handlePaste,
+                                display: clipboard.is([groupClipboardId, itemClipboardId]),
                             },
                             {
                                 label: "rename",
                                 handler: handleStartRename,
-                                disabled: isRootGroup,
+                                disabled: !group.config.canRename,
                             },
                             {
                                 label: "delete",
-                                handler: handleDeleteFolder,
-                                disabled: isRootGroup,
+                                handler: (_, ctx) => handleDeleteGroup(ctx),
+                                disabled: !group.config.canDelete,
                             }
                         ]}
+                        disabled={isDragging}
                     >
-                        <div
+                        {dndElement(<div
                             className={clsx("flex justify-between items-center px-2 py-1 cursor-pointer w-full select-none hover:bg-gray-100", {
                                 "bg-gray-100 hover:bg-gray-200": open,
                                 "bg-primary-100": isDropping,
@@ -168,32 +246,68 @@ export function FileBrowserFolder(
                                             onClick={(event) => {
                                                 event.stopPropagation();
                                             }}
+                                            className={"w-full text-black bg-transparent border-b border-black outline-none outline-primary-100 focus:bg-white focus:outline-1"}
                                         />
                                     )
                                     : (
                                         <span className={clsx({
                                             "italic text-gray-500": isRootGroup,
                                         })}>
-                                    {currentName}
+                                    {group.getName()}
                                 </span>
                                     )}
                             </div>
-                            <div
-                                className={clsx("text-gray-300 cursor-pointer hover:text-gray-400 hidden group-hover:block", {
-                                    "hidden": isRenaming,
-                                })}
-                                onClick={(event) => {
-                                    event.stopPropagation();
-                                    addCharacter(event);
-                                }}
-                            >{"+"}</div>
-                        </div>
+                            <HorizontalBox className={"items-center space-x-1"}>
+                                <div
+                                    className={clsx("text-gray-300 cursor-pointer hover:text-gray-400 hidden group-hover:block", {
+                                        "hidden": isRenaming,
+                                    })}
+                                    onClick={(event) => {
+                                        event.stopPropagation();
+                                        handleCreate();
+                                    }}
+                                >{"+"}</div>
+                                <div
+                                    className={clsx("text-gray-300 cursor-pointer hover:text-gray-400 hidden group-hover:block", {
+                                        "hidden": isRenaming,
+                                    })}
+                                    onClick={(event) => {
+                                        event.stopPropagation();
+                                        handleCreateGroup();
+                                    }}
+                                ><FolderPlusIcon className={"w-4 h-4"}/></div>
+                            </HorizontalBox>
+                        </div>)}
                     </ContextMenu>
 
                     {/*  folder content  */}
                     {open && (
                         <div className="pl-2">
-
+                            {group.toChildren().map(child => {
+                                if (Group.isGroup(child)) {
+                                    return (
+                                        <FileBrowserFolder
+                                            key={child.getName()}
+                                            {...props}
+                                            id={`${id}/[${child.getName()}]`}
+                                            group={child}
+                                            focusable={folderFocusable}
+                                        />
+                                    );
+                                } else {
+                                    return (
+                                        <FileBrowserItem
+                                            key={child.getName()}
+                                            {...props}
+                                            id={`${id}`}
+                                            isFolderDropping={isDropping}
+                                            focusable={folderFocusable}
+                                            item={child}
+                                            group={group}
+                                        />
+                                    );
+                                }
+                            })}
                         </div>
                     )}
                 </div>
